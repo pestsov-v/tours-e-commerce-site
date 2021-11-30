@@ -1,0 +1,29 @@
+{
+  "name": "tours-e-commerce-site",
+  "version": "1.0.0",
+  "description": "node js site",
+  "main": "index.js",
+  "scripts": {
+    "dev:server": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AveselsJS/tours-e-commerce-site.git"
+  },
+  "keywords": [
+    "nodejs",
+    "java",
+    "script",
+    "pug"
+  ],
+  "author": "vladislav pestsov <vladislav.pestsov@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AveselsJS/tours-e-commerce-site/issues"
+  },
+  "homepage": "https://github.com/AveselsJS/tours-e-commerce-site#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.15"
+  }
+}
