@@ -1,12 +1,10 @@
 const express = require('express');
+const morgan = require('morgan');
 const fs = require('fs');
-const app = express();
-app.use(express.json());
 
-app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString();
-  next();
-});
+const app = express();
+app.use(morgan('dev'));
+app.use(express.json());
 
 const PORT = 4000;
 const handleOpen = () => console.log(`Server is running on port ${PORT}`);
@@ -102,11 +100,53 @@ const deleteTour = (req, res) => {
   });
 };
 
-app.route('/api/v1/tours').get(getAllTours).post(createTour);
-app
-  .route('/api/v1/tours/:id')
-  .get(getTour)
-  .patch(updateTour)
-  .delete(deleteTour);
+const getAllUsers = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'Этот маршрут ещё не определён',
+  });
+};
+
+const createUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'Этот маршрут ещё не определён',
+  });
+};
+
+const getUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'Этот маршрут ещё не определён',
+  });
+};
+
+const updateUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'Этот маршрут ещё не определён',
+  });
+};
+
+const deleteUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'Этот маршрут ещё не определён',
+  });
+};
+
+const tourRouter = express.Router();
+
+tourRouter.route('/').get(getAllTours).post(createTour);
+tourRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
+
+app.use('/api/v1/tours', tourRouter);
+
+const userRouter = express.Router();
+
+userRouter.route('/').get(getAllUsers).post(createUser);
+userRouter.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
+
+app.use('/api/v1/users', userRouter);
 
 app.listen(PORT, handleOpen);
