@@ -4,7 +4,7 @@
   "description": "node js site",
   "main": "index.js",
   "scripts": {
-    "dev:server": "nodemon index.js"
+    "dev:server": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -12,8 +12,7 @@
   },
   "keywords": [
     "nodejs",
-    "java",
-    "script",
+    "java script",
     "pug"
   ],
   "author": "vladislav pestsov <vladislav.pestsov@gmail.com>",
