@@ -4,12 +4,14 @@ const tourRouter = express.Router();
 
 const router = express.Router();
 
-router.param('id', tourController.checkId);
+router
+  .route('/top-5-cheap')
+  .get(tourController.aliasTopTours, tourController.getAllTours);
 
 tourRouter
   .route('/')
   .get(tourController.getAllTours)
-  .post(tourController.checkBody, tourController.createTour);
+  .post(tourController.createTour);
 tourRouter
   .route('/:id')
   .get(tourController.getTour)
