@@ -8,6 +8,8 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'Тур должен иметь название'],
       unique: true,
       trim: true,
+      maxlength: [40, 'Название тура должно быть меньше 40 символов'],
+      minlength: [5, 'Название тура должно быть больше 5 символов'],
     },
     slug: {
       type: String,
@@ -23,10 +25,17 @@ const tourSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       required: [true, 'Тур должен наличивать сложность путешествия'],
+      enum: {
+        values: ['Лёгкая', 'Средняя', 'Трудная'],
+        message:
+          'Сложность может быть только трёх типов: "Лёгкая", "Средняя" или "Трудная"',
+      },
     },
     ratingsAverage: {
       type: Number,
       default: 4.5,
+      min: [1, 'Рейтинг не может быть ниже единицы'],
+      max: [5, 'Рейтинг не может быть больше 5'],
     },
     ratingsQuantity: {
       type: Number,
