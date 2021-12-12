@@ -89,18 +89,26 @@ tourSchema.pre('save', function (next) {
 //   next();
 // });
 
-// QUERY MIDDLEWARE
-tourSchema.pre(/^find/, function (next) {
-  this.find({ secretTour: { $ne: true } });
-  this.start = Date.now();
-  next();
-});
+// QUERY MIDDLEWARE: PRE HOOK
+// tourSchema.pre(/^find/, function (next) {
+//   this.find({ secretTour: { $ne: true } });
+//   this.start = Date.now();
+//   next();
+// });
 
-tourSchema.post(/^find/, function (docs, next) {
-  console.log(`Quqey took ${Date.now() - this.start} миллисекунд`);
-  console.log(docs);
-  next();
-});
+// // QUERY MIDDLEWARE: POST HOOK
+// tourSchema.post(/^find/, function (docs, next) {
+//   console.log(`Quqey took ${Date.now() - this.start} миллисекунд`);
+//   console.log(docs);
+//   next();
+// });
+
+// AGGRIGATION MIDDLEWARE
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   console.log(this.pipeline());
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
