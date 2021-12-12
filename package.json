@@ -27,7 +27,8 @@
     "express": "^4.17.1",
     "mongoose": "^6.0.14",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "slugify": "^1.6.3"
   },
   "devDependencies": {
     "eslint": "^8.4.0",
