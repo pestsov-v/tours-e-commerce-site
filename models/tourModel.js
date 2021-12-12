@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -10,6 +11,10 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxlength: [40, 'Название тура должно быть меньше 40 символов'],
       minlength: [5, 'Название тура должно быть больше 5 символов'],
+      // validate: [
+      //   validator.isAlpha,
+      //   'Название тура должно состоять только буквы',
+      // ],
     },
     slug: {
       type: String,
@@ -45,7 +50,15 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'Тур должен иметь стоимость'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function (val) {
+          return val < this.price;
+        },
+        message: 'Скидочная цена ({VALUE}) не может быть больше обычной цены',
+      },
+    },
     summary: {
       type: String,
       trim: true,
