@@ -17,9 +17,25 @@ app.use('/api/v1/tours', tourRoutes);
 app.use('/api/v1/users', userRoutes);
 
 app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Не удалось найти путь ${req.originalUrl} на сервере!`,
+  // res.status(404).json({
+  //   status: 'fail',
+  //   message: `Не удалось найти путь ${req.originalUrl} на сервере!`,
+  // });
+
+  const err = new Error(`Не удалось найти путь ${req.originalUrl} на сервере!`);
+  err.status = 'fail';
+  err.statusCode = 404;
+
+  next(err);
+});
+
+app.use((err, req, res, next) => {
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || 'error';
+
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message,
   });
 });
 
