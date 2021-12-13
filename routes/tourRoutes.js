@@ -13,14 +13,14 @@ router
 router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 
 tourRouter
+  .route('/')
+  .get(tourController.getAllTours)
+  .post(tourController.createTour);
+
+tourRouter
   .route('/:id')
   .get(tourController.getTour)
   .patch(tourController.updateTour)
   .delete(tourController.deleteTour);
-
-tourRouter
-  .route('/')
-  .get(tourController.getAllTours)
-  .post(tourController.createTour);
 
 module.exports = tourRouter;
