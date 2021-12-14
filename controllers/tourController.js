@@ -82,15 +82,11 @@ exports.createTour = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateTour = catchAsync(async (req, res, next) => {
+exports.updateTour = async (req, res) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
-
-  if (!tour) {
-    return next(new AppError('Не найден тур з данным ID', 404));
-  }
 
   res.status(200).json({
     status: 'success',
@@ -98,7 +94,7 @@ exports.updateTour = catchAsync(async (req, res, next) => {
       tour,
     },
   });
-});
+};
 
 exports.deleteTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findByIdAndDelete(req.params.id);
