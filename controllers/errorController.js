@@ -1,21 +1,21 @@
-const AppError = require('../utils/AppError');
+const AppError = require('./../utils/appError');
 
 const handleCastErrorDB = (err) => {
-  const message = `Не существующий ${err.path}: ${err.value}.`;
+  const message = `Не действительный ${err.path}: ${err.value}.`;
   return new AppError(message, 400);
 };
 
 const handleDuplicateFieldsDB = (err) => {
-  const errors = Object.values(err.errors).map((el) => el.message);
   const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
+  console.log(value);
 
-  const message = `Дублировано уникальное значение: ${value}. Пожалуйста используйте другое значение!`;
+  const message = `Дублирующееся значение: ${value}. Пожалуйста используйте другое значение!`;
   return new AppError(message, 400);
 };
-
 const handleValidationErrorDB = (err) => {
   const errors = Object.values(err.errors).map((el) => el.message);
-  const message = `Неверные вводимые данные. ${errors.join(' ')}`;
+
+  const message = `Ошибочные данные из базы данных. ${errors.join('. ')}`;
   return new AppError(message, 400);
 };
 
@@ -35,10 +35,9 @@ const sendErrorProd = (err, res) => {
       message: err.message,
     });
   } else {
-    // LOGGED ERROR
-    console.error('error', err);
+    console.error('ERROR', err);
 
-    // SEND GENERIC
+    // 2) Send generic message
     res.status(500).json({
       status: 'error',
       message: 'Что-то пошло не так...',
@@ -46,12 +45,14 @@ const sendErrorProd = (err, res) => {
   }
 };
 
-module.exports = (err, req, res) => {
+module.exports = (err, req, res, next) => {
+  // console.log(err.stack);
+
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(err, req, res);
+    sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
 
@@ -60,6 +61,6 @@ module.exports = (err, req, res) => {
     if (error.name === 'ValidationError')
       error = handleValidationErrorDB(error);
 
-    sendErrorProd(error, req, res);
+    sendErrorProd(error, res);
   }
 };
