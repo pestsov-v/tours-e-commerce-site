@@ -10,10 +10,6 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxlength: [40, 'Название тура должно быть меньше 40 символов'],
       minlength: [5, 'Название тура должно быть больше 5 символов'],
-      // validate: [
-      //   validator.isAlpha,
-      //   'Название тура должно состоять только буквы',
-      // ],
     },
     slug: {
       type: String,
@@ -97,39 +93,6 @@ tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
-
-// DOCUMENT MIDDLEWARE: PRE HOOK
-// tourSchema.pre('save', function (next) {
-//   console.log('Когда сохранили документ...');
-//   next();
-// });
-
-// DOCUMENT MIDDLEWARE: POST HOOK
-// tourSchema.post('save', function (doc, next) {
-//   console.log(doc);
-//   next();
-// });
-
-// QUERY MIDDLEWARE: PRE HOOK
-// tourSchema.pre(/^find/, function (next) {
-//   this.find({ secretTour: { $ne: true } });
-//   this.start = Date.now();
-//   next();
-// });
-
-// // QUERY MIDDLEWARE: POST HOOK
-// tourSchema.post(/^find/, function (docs, next) {
-//   console.log(`Quqey took ${Date.now() - this.start} миллисекунд`);
-//   console.log(docs);
-//   next();
-// });
-
-// AGGRIGATION MIDDLEWARE
-// tourSchema.pre('aggregate', function (next) {
-//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-//   console.log(this.pipeline());
-//   next();
-// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
