@@ -17,6 +17,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     passwordChangedAt: req.body.passwordChangedAt,
+    role: req.body.role,
   });
 
   const token = signToken(newUser._id);
@@ -54,8 +55,11 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
 
-  if (req.query.authorization && req.query.authorization.startsWith('Bearer')) {
-    token = req.query.authorization.split(' ')[1];
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
   }
 
   if (!token) {
@@ -68,16 +72,15 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  console.log(decoded);
 
-  const freshUser = await User.findById(decoded.id);
-  if (!freshUser) {
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
     return next(
       new AppError('Токен, который Вам принадлежит, больше не существует.', 401)
     );
   }
 
-  if (freshUser.changedPasswordAfter(decoded.iat)) {
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError(
         'Пользователь недавно изменил пароль. Пожалуйста ввойдите ещё раз',
@@ -86,7 +89,22 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  req.user = freshUser;
+  req.user = currentUser;
 
   next();
 });
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError(
+          'Вы не владеете достаточными правами для совершения подобных действий',
+          403
+        )
+      );
+    }
+
+    next();
+  };
+};

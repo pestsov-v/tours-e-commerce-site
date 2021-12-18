@@ -1,5 +1,5 @@
 const express = require('express');
-const { protect } = require('../controllers/authController');
+const { protect, restrictTo } = require('../controllers/authController');
 const {
   getAllTours,
   createTour,
@@ -21,6 +21,11 @@ tourRoute.post('/', createTour);
 
 tourRoute.get('/:id', getTour);
 tourRoute.patch('/:id', updateTour);
-tourRoute.delete('/:id', deleteTour);
+tourRoute.delete(
+  '/:id',
+  protect,
+  restrictTo('admin', 'lead-guide'),
+  deleteTour
+);
 
 module.exports = tourRoute;
