@@ -3,6 +3,7 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const jwt = require('jsonwebtoken');
 const AppError = require('../utils/AppError');
+const sendEmail = require('../utils/email');
 
 const signToken = (id) => {
   return (token = jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -119,6 +120,36 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
+
+  const resetURL = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/resetPassword/${resetToken}`;
+
+  const message = `Забыли пароль? Отправьте запрос на исправление с Вашим новым паролем и паролем подтверждения на почту: ${resetURL}.\n Если вы не забывали пароль, пожалуйста проигнорируйте это письмо`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Восстановление пароля',
+      message,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Токен отправлен на почту',
+    });
+  } catch (e) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+    console.log(e);
+    return next(
+      new AppError(
+        'При отправке сообщения произошла ошибка. Пожалуйста попробуйте ещё раз позже',
+        500
+      )
+    );
+  }
 });
 
 exports.resetPassword = (req, res, next) => {};
