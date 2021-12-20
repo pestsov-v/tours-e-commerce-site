@@ -31,7 +31,7 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '100kb' }));
 
 app.use(mongoSanitize());
 app.use(xss());
