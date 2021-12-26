@@ -9,11 +9,9 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       maxlength: [40, 'Название тура должно быть меньше 40 символов'],
-      minlength: [5, 'Название тура должно быть больше 5 символов'],
+      minlength: [10, 'Название тура должно быть больше 5 символов'],
     },
-    slug: {
-      type: String,
-    },
+    slug: String,
     duration: {
       type: Number,
       required: [true, 'Тур должен иметь продолжительность'],
@@ -36,6 +34,7 @@ const tourSchema = new mongoose.Schema(
       default: 4.5,
       min: [1, 'Рейтинг не может быть ниже единицы'],
       max: [5, 'Рейтинг не может быть больше 5'],
+      set: (val) => Math.round(val * 10) / 10,
     },
     ratingsQuantity: {
       type: Number,
@@ -78,8 +77,6 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-  },
-  {
     startLocation: {
       type: {
         type: String,
@@ -101,6 +98,12 @@ const tourSchema = new mongoose.Schema(
         address: String,
         description: String,
         day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
       },
     ],
   },
