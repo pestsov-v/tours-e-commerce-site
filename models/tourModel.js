@@ -113,6 +113,15 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+
+  next();
+});
+
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
