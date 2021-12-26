@@ -122,6 +122,12 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+});
+
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
