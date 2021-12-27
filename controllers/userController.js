@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const AppErorr = require('../utils/AppError');
 const catchAsync = require('../utils/catchAsync');
+const handlerFactory = require('../controllers/handlerFactory');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -79,9 +80,4 @@ exports.updateUser = (req, res) => {
   });
 };
 
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Этот маршрут ещё не определён',
-  });
-};
+exports.deleteUser = handlerFactory.deleteOne(User);

@@ -6,13 +6,12 @@ const {
   forgotPassword,
   protect,
   updatePassword,
-  restrictTo,
 } = require('../controllers/authController');
-const { createReview } = require('../controllers/reviewController');
 const {
   getAllUsers,
   updateMe,
   deleteMe,
+  deleteUser,
 } = require('../controllers/userController');
 const userRoute = express.Router();
 
@@ -28,5 +27,7 @@ userRoute.patch('/updateMe', protect, updateMe);
 userRoute.delete('/deleteMe', protect, deleteMe);
 
 userRoute.get('/', getAllUsers);
+
+userRoute.delete('/:id', deleteUser);
 
 module.exports = userRoute;
