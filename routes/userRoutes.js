@@ -6,7 +6,9 @@ const {
   forgotPassword,
   protect,
   updatePassword,
+  restrictTo,
 } = require('../controllers/authController');
+const { createReview } = require('../controllers/reviewController');
 const {
   getAllUsers,
   updateMe,
