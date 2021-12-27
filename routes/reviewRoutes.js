@@ -4,6 +4,7 @@ const {
   getAllReviews,
   createReview,
 } = require('../controllers/reviewController');
+
 const reviewRouter = express.Router({ mergeParams: true });
 
 reviewRouter.get('/', getAllReviews);
