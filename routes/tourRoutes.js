@@ -1,6 +1,7 @@
 const express = require('express');
+const reviewRouter = require('../routes/reviewRoutes');
 const { protect, restrictTo } = require('../controllers/authController');
-const { createReview } = require('../controllers/reviewController');
+
 const {
   getAllTours,
   createTour,
@@ -12,6 +13,8 @@ const {
   aliasTopTours,
 } = require('../controllers/tourController');
 const tourRoute = express.Router();
+
+tourRoute.use('/:tourId/reviews', reviewRouter);
 
 tourRoute.get('/stats', getTourStats);
 tourRoute.get('/monthly-plan/:year', getMonthlyPlan);
@@ -28,7 +31,5 @@ tourRoute.delete(
   restrictTo('admin', 'lead-guide'),
   deleteTour
 );
-
-tourRoute.post('/:tourId/reviews', protect, restrictTo('admin'), createReview);
 
 module.exports = tourRoute;
