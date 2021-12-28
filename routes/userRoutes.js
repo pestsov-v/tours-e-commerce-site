@@ -12,6 +12,7 @@ const {
   updateMe,
   deleteMe,
   deleteUser,
+  updateUser,
 } = require('../controllers/userController');
 const userRoute = express.Router();
 
@@ -27,7 +28,7 @@ userRoute.patch('/updateMe', protect, updateMe);
 userRoute.delete('/deleteMe', protect, deleteMe);
 
 userRoute.get('/', getAllUsers);
-
+userRoute.patch('/:id', updateUser);
 userRoute.delete('/:id', deleteUser);
 
 module.exports = userRoute;
