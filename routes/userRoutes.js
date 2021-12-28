@@ -13,22 +13,24 @@ const {
   deleteMe,
   deleteUser,
   updateUser,
+  getMe,
+  getUser,
 } = require('../controllers/userController');
 const userRoute = express.Router();
-
-userRoute.post('/signup', signup);
-userRoute.post('/login', login);
-
-userRoute.post('/forgotPassword', forgotPassword);
-userRoute.patch('/resetPassword/:token', resetPassword);
-
-userRoute.patch('/updateMyPassword', protect, updatePassword);
-
-userRoute.patch('/updateMe', protect, updateMe);
-userRoute.delete('/deleteMe', protect, deleteMe);
 
 userRoute.get('/', getAllUsers);
 userRoute.patch('/:id', updateUser);
 userRoute.delete('/:id', deleteUser);
+
+userRoute.post('/signup', signup);
+userRoute.post('/login', login);
+
+userRoute.get('/me', protect, getMe, getUser);
+userRoute.patch('/updateMe', protect, updateMe);
+userRoute.delete('/deleteMe', protect, deleteMe);
+
+userRoute.post('/forgotPassword', forgotPassword);
+userRoute.patch('/resetPassword/:token', resetPassword);
+userRoute.patch('/updateMyPassword', protect, updatePassword);
 
 module.exports = userRoute;
