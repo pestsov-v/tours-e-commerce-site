@@ -11,16 +11,12 @@ const {
 
 const reviewRouter = express.Router({ mergeParams: true });
 
+reviewRouter.use(protect);
+
 reviewRouter.get('/', getAllReviews);
 reviewRouter.get('/:id', getReview);
-reviewRouter.post(
-  '/',
-  protect,
-  restrictTo('admin'),
-  setTourUserIds,
-  createReview
-);
-reviewRouter.patch('/:id', updateReview);
-reviewRouter.delete('/:id', deleteReview);
+reviewRouter.post('/', restrictTo('admin'), setTourUserIds, createReview);
+reviewRouter.patch('/:id', restrictTo('user', 'admin'), updateReview);
+reviewRouter.delete('/:id', restrictTo('user', 'admin'), deleteReview);
 
 module.exports = reviewRouter;
