@@ -6,11 +6,13 @@ const {
   deleteReview,
   updateReview,
   setTourUserIds,
+  getReview,
 } = require('../controllers/reviewController');
 
 const reviewRouter = express.Router({ mergeParams: true });
 
 reviewRouter.get('/', getAllReviews);
+reviewRouter.get('/:id', getReview);
 reviewRouter.post(
   '/',
   protect,
