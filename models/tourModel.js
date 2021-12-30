@@ -113,6 +113,8 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+tourSchema.index({ startLocation: '2dsphere' });
+
 tourSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'guides',

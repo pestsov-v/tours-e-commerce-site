@@ -8,6 +8,7 @@ const {
   updatePassword,
   restrictTo,
 } = require('../controllers/authController');
+const { getToursWithin } = require('../controllers/tourController');
 const {
   getAllUsers,
   updateMe,
