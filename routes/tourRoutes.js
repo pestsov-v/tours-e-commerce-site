@@ -11,6 +11,7 @@ const {
   getMonthlyPlan,
   aliasTopTours,
   getToursWithin,
+  getDistances,
 } = require('../controllers/tourController');
 
 const tourRoute = express.Router();
@@ -30,6 +31,8 @@ tourRoute.get(
   '/tours-within/:distance/center/:latlng/unit/:unit',
   getToursWithin
 );
+
+tourRoute.get('/distances/:latlng/unit/:unit', getDistances);
 
 tourRoute.get('/', getAllTours);
 tourRoute.post('/', protect, restrictTo('admin', 'lead-guide'), createTour);

@@ -108,12 +108,53 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
     startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
   });
 
-  console.log(distance, lat, lng, unit);
   res.status(200).json({
     status: 'success',
     results: tours.length,
     data: {
       data: tours,
+    },
+  });
+});
+
+exports.getDistances = catchAsync(async (req, res, next) => {
+  const { latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+
+  if (!lat || !lng) {
+    next(
+      new AppErorr(
+        'Пожалуйста приведите формат широты и долготы в формат: "lat, lng"'
+      ),
+      400
+    );
+  }
+
+  const distances = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [lng * 1, lat * 1],
+        },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier,
+      },
+    },
+    {
+      $project: {
+        distance: 1,
+        name: 1,
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data: distances,
     },
   });
 });
