@@ -1,2 +1,13 @@
-h1 Парк кемпер
+doctype html
+html 
+    head
+        title Приключения | #{tour}
+        link(rel="stylesheet", href="css/style.css")
+        link(rel="shortcut icon", type="image/png", href="img/favicon.png")
+    body
+        h1= tour 
+        h2= user.toUpperCase()
 
+        - const x = 9
+        h2= 2 * x
+        p This is just some text

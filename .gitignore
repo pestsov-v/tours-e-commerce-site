@@ -1,4 +1,5 @@
 node_modules
 dev-data
-public
 .env
+public/overview.html
+public/tour.html
