@@ -1,8 +1,25 @@
 const express = require('express');
-const { getOverview, getTour } = require('../controllers/viewsController');
+const { protect } = require('../controllers/authController');
+const { getOverview, getTour, getLoginForm} = require('../controllers/viewsController');
 const viewRoute = express.Router();
 
-viewRoute.get('/overview', getOverview);
-viewRoute.get('/tour/:slug', getTour);
+viewRoute.use(function (req, res, next) {
+    res.setHeader(
+      "Content-Security-Policy",
+      "script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"
+    );
+    next();
+  });
+  
+  viewRoute.use(function (req, res, next) {
+    res.setHeader("Content-Security-Policy", "script-src * 'self' data: https:;");
+    next();
+  });
+
+viewRoute.get('/login', getLoginForm)
+viewRoute.get('/', getOverview);
+viewRoute.get('/tour/:slug', protect, getTour);
+
+
 
 module.exports = viewRoute;
