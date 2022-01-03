@@ -16,9 +16,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
     fields: 'reviews rating user',
   });
 
-  res
-  .status(200)
-  .render('tour', {
+  res.status(200).render('tour', {
     title: `${tour.name}`,
     tour,
   });
@@ -26,6 +24,6 @@ exports.getTour = catchAsync(async (req, res, next) => {
 
 exports.getLoginForm = catchAsync(async (req, res, next) => {
   res.status(200).render('login', {
-    title: 'Профиль'
-  })
-})
+    title: 'Профиль',
+  });
+});
