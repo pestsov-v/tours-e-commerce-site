@@ -7,32 +7,20 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 const AppError = require('./utils/AppError');
 const globalErrorHandler = require('./controllers/errorController');
-const cors = require('cors')
 
 const tourRoutes = require('./routes/tourRoutes');
 const userRoutes = require('./routes/userRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const viewRoutes = require('./routes/viewRoutes');
 
-
 const app = express();
 
-app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use(express.json({ limit: '100kb' }));
-
-// const corsOptions = {
-//   origin: 'http://localhost:4000',
-//   credentials: true,
-//   optionSuccessStatus:200
-// }
-
-
-
-app.use(cors())
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
@@ -41,11 +29,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(helmet());
 
-
 app.use((req, res, next) => {
-  console.log(req.cookies)
-  next()
-})
+  console.log(req.cookies);
+  next();
+});
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -85,8 +72,6 @@ app.all('*', (req, res, next) => {
     new AppError(`Не удалось найти путь ${req.originalUrl} на сервере!`, 404)
   );
 });
-
-
 
 app.use(globalErrorHandler);
 
