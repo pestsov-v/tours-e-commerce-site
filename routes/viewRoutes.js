@@ -1,5 +1,5 @@
 const express = require('express');
-const { getOverview, getTour} = require('../controllers/viewsController');
+const { getOverview, getTour, getLoginForm} = require('../controllers/viewsController');
 const viewRoute = express.Router();
 
 const CSP = 'Content-Security-Policy';
@@ -22,5 +22,6 @@ viewRoute.use((req, res, next) => {
 
 viewRoute.get('/', getOverview);
 viewRoute.get('/tour/:slug', getTour);
+viewRoute.get('/login', getLoginForm)
 
 module.exports = viewRoute;
