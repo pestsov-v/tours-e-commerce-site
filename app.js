@@ -29,10 +29,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(helmet());
 
-app.use((req, res, next) => {
-  console.log(req.cookies);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(req.cookies);
+//   next();
+// });
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));

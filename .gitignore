@@ -3,3 +3,4 @@ dev-data
 .env
 public/overview.html
 public/tour.html
+.cache
