@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
+const AppErorr = require('../utils/AppError')
 
 exports.getOverview = catchAsync(async (req, res) => {
   const tours = await Tour.find();
@@ -15,6 +16,11 @@ exports.getTour = catchAsync(async (req, res, next) => {
     path: 'reviews',
     fields: 'reviews rating user',
   });
+
+
+  if (!tour) {
+    return next(new AppErorr('Такой страницы не существует', 404))
+  }
 
   res.status(200).render('tour', {
     title: `${tour.name}`,
