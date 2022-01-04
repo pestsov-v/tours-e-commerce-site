@@ -1,0 +1,63 @@
+extends base
+
+mixin navItem(link, text, icon, active)
+    li(class=`${active ? '.side-nav--active' : ''}`)
+        a(href=`${link}`)
+            svg
+                use(xlink:href=`img/icons.svg#icon-${icon}`)
+            | #{text}
+
+block content 
+    main.main
+        .user-view
+            nav.user-view__menu
+                ul.side-nav
+                    +navItem('#', 'Настройки', 'settings', true)
+                    +navItem('#', 'Мои бронирования', 'briefcase')
+                    +navItem('#', 'Мои комментарии', 'star')
+                    +navItem('#', 'Оплата', 'credit-card')
+                    +navItem('#', 'Настройки', 'settings')
+                
+                - if (user.role === 'admin')
+                    .admin-nav
+                        h5.admin-nav__heading Администратор
+                        ul.side-nav
+                            +navItem('#', 'Редактировать туры', 'map')
+                            +navItem('#', 'Редактировать пользователей', 'users')
+                            +navItem('#', 'Редактировать комментарии', 'star')
+                            +navItem('#', 'Редактировать бронирования', 'briefcase')
+
+
+            .user-view__content
+                .user-view__form-container
+                    h2.heading-secondary.ma-bt-md Ваши настройки
+                        | 
+                        form.form.form-user-data
+                        .form__group
+                            label.form__label(for='name') Имя
+                            input#name.form__input(type='text', value=`${user.name}`, required)
+                        .form__group.ma-bt-md
+                            label.form__label(for='email') Email адрес
+                            input#email.form__input(type='email', value=`${user.email}`, required)
+                        .form__group.form__photo-upload
+                            img.form__user-photo(src=`/img/users/${user.photo}`, alt='User photo')
+                            a.btn-text(href='') Выберите ваше фото
+                        .form__group.right
+                            button.btn.btn--small.btn--green Сохранить настройки
+
+                .line &nbsp;
+
+                .user-view__form-container
+                    h2.heading-secondary.ma-bt-md Изменить пароль
+                    form.form.form-user-settings
+                        .form__group
+                            label.form__label(for='password-current') Текущий пароль
+                            input#password-current.form__input(type='password', placeholder='••••••••', required, minlength='8')
+                        .form__group
+                            label.form__label(for='password') Новый пароль
+                            input#password.form__input(type='password', placeholder='••••••••', required, minlength='8')
+                        .form__group.ma-bt-lg
+                            label.form__label(for='password-confirm') Подтвердите новый пароль
+                            input#password-confirm.form__input(type='password', placeholder='••••••••', required, minlength='8')
+                        .form__group.right
+                            button.btn.btn--small.btn--green Сохранить новый пароль

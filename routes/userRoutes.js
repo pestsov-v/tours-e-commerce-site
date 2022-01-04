@@ -7,8 +7,8 @@ const {
   protect,
   updatePassword,
   restrictTo,
+  logout,
 } = require('../controllers/authController');
-const { getToursWithin } = require('../controllers/tourController');
 const {
   getAllUsers,
   updateMe,
@@ -22,6 +22,7 @@ const userRoute = express.Router();
 
 userRoute.post('/signup', signup);
 userRoute.post('/login', login);
+userRoute.get('/logout', logout);
 userRoute.post('/forgotPassword', forgotPassword);
 userRoute.patch('/resetPassword/:token', resetPassword);
 

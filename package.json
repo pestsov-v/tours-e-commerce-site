@@ -6,7 +6,9 @@
   "scripts": {
     "dev:server": "nodemon server.js",
     "prod:server": "NODE_ENV=production nodemon server.js",
-    "debug": "ndb server.js"
+    "debug": "ndb server.js",
+    "watch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js  --public-url .",
+    "build:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +26,7 @@
   },
   "homepage": "https://github.com/AveselsJS/tours-e-commerce-site#readme",
   "dependencies": {
+    "@babel/polyfill": "^7.4.4",
     "axios": "^0.24.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
@@ -39,6 +42,7 @@
     "morgan": "^1.10.0",
     "nodemailer": "^6.7.2",
     "nodemon": "^2.0.15",
+    "parcel-bundler": "^1.12.3",
     "pug": "^3.0.2",
     "slugify": "^1.6.3",
     "validator": "^13.7.0",
