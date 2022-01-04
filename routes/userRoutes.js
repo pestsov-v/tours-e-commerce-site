@@ -27,12 +27,11 @@ userRoute.post('/forgotPassword', forgotPassword);
 userRoute.patch('/resetPassword/:token', resetPassword);
 
 userRoute.use(protect);
-
+userRoute.patch('/updateMe', updateMe);
 userRoute.patch('/:id', updateUser);
 userRoute.delete('/:id', deleteUser);
 userRoute.get('/me', getMe, getUser);
 
-userRoute.patch('/updateMe', updateMe);
 userRoute.delete('/deleteMe', deleteMe);
 
 userRoute.patch('/updateMyPassword', updatePassword);

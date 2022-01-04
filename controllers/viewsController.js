@@ -52,9 +52,8 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
       runValidators: true,
     }
   );
-
   res.status(200).render('account', {
-    title: 'Your account',
+    title: 'Профиль',
     user: updatedUser,
   });
 });
