@@ -1,6 +1,6 @@
 const express = require('express');
 const { protect, isLoggedIn } = require('../controllers/authController');
-const { getOverview, getTour, getLoginForm} = require('../controllers/viewsController');
+const { getOverview, getTour, getLoginForm, getAccount} = require('../controllers/viewsController');
 const viewRoute = express.Router();
 
 
@@ -18,10 +18,10 @@ viewRoute.use(function (req, res, next) {
   next();
 });
 
-viewRoute.use(isLoggedIn);
-viewRoute.get('/login', getLoginForm);
-viewRoute.get('/', getOverview);
-viewRoute.get('/tour/:slug', getTour);
+viewRoute.get('/login', isLoggedIn, getLoginForm);
+viewRoute.get('/', isLoggedIn, getOverview);
+viewRoute.get('/tour/:slug', isLoggedIn, getTour);
+viewRoute.get('/me', protect, getAccount);
 
 
 

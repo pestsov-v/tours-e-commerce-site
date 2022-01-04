@@ -33,3 +33,9 @@ exports.getLoginForm = catchAsync(async (req, res, next) => {
     title: 'Профиль',
   });
 });
+
+exports.getAccount = (req, res, next) => {
+  res.status(200).render('account', {
+    title: 'Ваш аккаунт'
+  })
+}
