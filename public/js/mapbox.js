@@ -1,5 +1,5 @@
 export const displayMap = (locations) => {
-    mapboxgl.accessToken =
+  mapboxgl.accessToken =
     'pk.eyJ1IjoiYXZlc2VscyIsImEiOiJja3h5bnVrNjI1MndkMnB1YmR3d21kenRrIn0.rEUqeq1wBKOKYmdinW5EuA';
 
   const map = new mapboxgl.Map({
@@ -39,6 +39,4 @@ export const displayMap = (locations) => {
       right: 100,
     },
   });
-}
-
-
+};

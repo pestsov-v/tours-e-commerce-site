@@ -8722,7 +8722,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.showAlert = exports.hideAlert = void 0;
 
 var hideAlert = function hideAlert() {
-  var el = document.querySelector(".alert");
+  var el = document.querySelector('.alert');
   if (el) el.parentElement.removeChild(el);
 };
 
@@ -9112,7 +9112,7 @@ var _mapbox = require("./mapbox");
 var _login = require("./login");
 
 var mapBox = document.getElementById('map');
-var loginForm = document.querySelector('.form');
+var loginForm = document.querySelector('.form--login');
 var logOutBtn = document.querySelector('.nav__el--logout');
 
 if (mapBox) {
@@ -9160,7 +9160,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58451" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53590" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

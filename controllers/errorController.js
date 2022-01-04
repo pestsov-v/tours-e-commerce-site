@@ -42,10 +42,9 @@ const sendErrorDev = (err, req, res) => {
   } else {
     res.status(err.statusCode).render('error', {
       title: 'Что-то произошло не так...',
-      msg: err.message
-    })
+      msg: err.message,
+    });
   }
-  
 };
 
 const sendErrorProd = (err, req, res) => {
@@ -53,7 +52,7 @@ const sendErrorProd = (err, req, res) => {
     if (err.isOperational) {
       return res.status(err.statusCode).json({
         status: err.status,
-        message: err.message
+        message: err.message,
       });
     }
 
@@ -61,7 +60,7 @@ const sendErrorProd = (err, req, res) => {
 
     return res.status(500).json({
       status: 'error',
-      message: 'Что-то пошло не так!'
+      message: 'Что-то пошло не так!',
     });
   }
 
@@ -69,7 +68,7 @@ const sendErrorProd = (err, req, res) => {
     console.log(err);
     return res.status(err.statusCode).render('error', {
       title: 'Что-то пошло не так!',
-      msg: err.message
+      msg: err.message,
     });
   }
 
@@ -77,7 +76,7 @@ const sendErrorProd = (err, req, res) => {
 
   return res.status(err.statusCode).render('error', {
     title: 'Что-то пошло не так!',
-    msg: 'Пожалуйста попробуйте позже.'
+    msg: 'Пожалуйста попробуйте позже.',
   });
 };
 
@@ -89,7 +88,7 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
-    error.message = err.message
+    error.message = err.message;
 
     if (error.name === 'CastError') error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
