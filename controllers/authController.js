@@ -69,7 +69,7 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.logout = (req, res) => {
   res.cookie('jwt', 'loggedout', {
     expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
+    httpOnly: true,
   });
   res.status(200).json({ status: 'success' });
 };
@@ -83,7 +83,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1];
   } else if (req.cookies.jwt) {
-    token = req.cookies.jwt
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -137,13 +137,12 @@ exports.isLoggedIn = async (req, res, next) => {
       res.locals.user = currentUser;
       return next();
     } catch (e) {
-      console.log(e)
+      console.log(e);
       return next();
     }
   }
   next();
 };
-
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {

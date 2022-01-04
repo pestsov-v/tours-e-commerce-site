@@ -18,9 +18,11 @@ const viewRoutes = require('./routes/viewRoutes');
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.json({ limit: '100kb' }));
+
+// app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
