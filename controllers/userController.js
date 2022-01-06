@@ -2,18 +2,38 @@ const User = require('../models/userModel');
 const AppErorr = require('../utils/AppError');
 const catchAsync = require('../utils/catchAsync');
 const handlerFactory = require('../controllers/handlerFactory');
-const multer = require('multer')
+const multer = require('multer');
 
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'public/img/users');
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split('/')[1];
+    cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+  },
+});
 
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(
+      new AppErorr(
+        'Файл не является картинкой. Пожалуйста загрузите картинку.',
+        400
+      ),
+      false
+    );
   }
-})
+};
 
-const upload = multer({ dest: 'public/img/users'})
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
 
-exports.uploadUserPhoto = upload.single('photo')
+exports.uploadUserPhoto = upload.single('photo');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -30,8 +50,6 @@ exports.getMe = (req, res, next) => {
 };
 
 exports.updateMe = catchAsync(async (req, res, next) => {
-  console.log(req.file)
-  console.log(req.body)
   if (req.body.password || req.body.passwordConfirm) {
     return next(
       new AppErorr(
@@ -42,6 +60,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   }
 
   const filteredBody = filterObj(req.body, 'name', 'email');
+  if (req.file) filteredBody.photo = req.file.filename;
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true,
@@ -58,7 +77,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, {
     active: false,
-});
+  });
 
   res.status(204).json({
     status: 'success',
