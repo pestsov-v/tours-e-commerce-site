@@ -4,7 +4,7 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const jwt = require('jsonwebtoken');
 const AppError = require('../utils/AppError');
-const sendEmail = require('../utils/email');
+const Email = require('../utils/email');
 
 const signToken = (id) => {
   return (token = jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -45,6 +45,10 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordChangedAt: req.body.passwordChangedAt,
     role: req.body.role,
   });
+
+  const url = `${req.protocol}://${req.get('host')}/me`;
+  console.log(url);
+  await new Email(newUser, url).sendWelcome();
 
   createSendToken(newUser, 201, res);
 });
@@ -182,11 +186,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const message = `Забыли пароль? Отправьте запрос на исправление с Вашим новым паролем и паролем подтверждения на почту: ${resetURL}.\n Если вы не забывали пароль, пожалуйста проигнорируйте это письмо`;
 
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Восстановление пароля',
-      message,
-    });
+    // await sendEmail({
+    //   email: user.email,
+    //   subject: 'Восстановление пароля',
+    //   message,
+    // });
 
     res.status(200).json({
       status: 'success',
