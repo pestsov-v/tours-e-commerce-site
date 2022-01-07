@@ -12,6 +12,8 @@ const {
   aliasTopTours,
   getToursWithin,
   getDistances,
+  uploadTourImages,
+  resizeTourImages,
 } = require('../controllers/tourController');
 
 const tourRoute = express.Router();
@@ -38,7 +40,14 @@ tourRoute.get('/', getAllTours);
 tourRoute.post('/', protect, restrictTo('admin', 'lead-guide'), createTour);
 
 tourRoute.get('/:id', getTour);
-tourRoute.patch('/:id', protect, restrictTo('admin', 'lead-guide'), updateTour);
+tourRoute.patch(
+  '/:id',
+  protect,
+  restrictTo('admin', 'lead-guide'),
+  uploadTourImages,
+  resizeTourImages,
+  updateTour
+);
 tourRoute.delete(
   '/:id',
   protect,
