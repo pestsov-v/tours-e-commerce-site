@@ -43,7 +43,7 @@ module.exports = class Email {
       text: htmlToText.fromString(html),
     };
 
-    await this.newTransport().sendEmail(mailOptions);
+    await this.newTransport().sendMail(mailOptions);
   }
 
   async sendWelcome() {
