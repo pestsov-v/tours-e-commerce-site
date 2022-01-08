@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 
 const bookingSchema = new mongoose.Schema({
   tour: {
-    type: mongoose.Schema.objectId,
+    type: mongoose.Schema.ObjectId,
     ref: 'Tour',
     required: [true, 'Бронирование должен иметь тур!'],
   },
   user: {
-    type: mongoose.Schema.objectId,
-    ref: 'Tour',
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
     required: [true, 'Бронирование должен иметь пользователя!'],
   },
   price: {
