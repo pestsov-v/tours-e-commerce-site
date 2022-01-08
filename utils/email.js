@@ -49,4 +49,11 @@ module.exports = class Email {
   async sendWelcome() {
     await this.send('welcome', 'Добро пожаловать в семью Приключений!');
   }
+
+  async sendPasswordReset() {
+    await this.send(
+      'passwordReset',
+      'Сбросить пароль (действие возможно выполнить на протяжении 10 минут)'
+    );
+  }
 };
