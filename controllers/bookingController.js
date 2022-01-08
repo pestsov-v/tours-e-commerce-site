@@ -5,7 +5,7 @@ const handlerFactory = require('../controllers/handlerFactory');
 const AppErorr = require('../utils/AppError');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.tourID);
+  const tour = await Tour.findById(req.params.tourId);
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
