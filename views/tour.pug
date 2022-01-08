@@ -5,6 +5,7 @@ block append head
     script(src='https://api.mapbox.com/mapbox-gl-js/v0.54.0/mapbox-gl.js')
     link(href='https://api.mapbox.com/mapbox-gl-js/v0.54.0/mapbox-gl.css' rel='stylesheet')
     
+    
 
 block content 
     section.section-header
@@ -81,7 +82,10 @@ block content
             .cta__content
                 h2.heading-secondary Что вас заставляет медлить?
                 p.cta__text= `${tour.duration }  cуток. 1 приключение. Незабываемые воспоминания. Сделай это сегодня!`
-                button.btn.btn--green.span-all-rows Забронировать сейчас
 
+                if user
+                    button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}`) Забронировать сейчас
+                else 
+                    a.btn.btn--green.span-all-rows(href='/login') Войти чтобы забронировать тур
 
                 

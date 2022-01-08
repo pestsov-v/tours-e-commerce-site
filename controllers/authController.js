@@ -179,18 +179,12 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/resetPassword/${resetToken}`;
-
-  const message = `Забыли пароль? Отправьте запрос на исправление с Вашим новым паролем и паролем подтверждения на почту: ${resetURL}.\n Если вы не забывали пароль, пожалуйста проигнорируйте это письмо`;
-
   try {
-    // await sendEmail({
-    //   email: user.email,
-    //   subject: 'Восстановление пароля',
-    //   message,
-    // });
+    const resetURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/v1/resetPassword/${resetToken}`;
+
+    await new Email(user, resetURL).sendPasswordReset();
 
     res.status(200).json({
       status: 'success',
