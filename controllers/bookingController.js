@@ -3,7 +3,6 @@ const Tour = require('../models/tourModel');
 const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const handlerFactory = require('../controllers/handlerFactory');
-const AppErorr = require('../utils/AppError');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(req.params.tourId);
@@ -37,14 +36,14 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 exports.createBookingCheckout = catchAsync(async (req, res, next) => {
   const { tour, user, price } = req.query;
 
-  console.log('query', req.query);
   if (!tour && !user && !price) return next();
 
-  const booking = await Booking.create({
-    tour: tour,
-    user: user,
-    price: price,
-  });
-  console.log('Booking', booking);
+  const booking = await Booking.create({ tour, user, price });
   res.redirect(req.originalUrl.split('?')[0]);
 });
+
+exports.getAllBookings = handlerFactory.getAll(Booking);
+exports.getBooking = handlerFactory.getOne(Booking);
+exports.createBooking = handlerFactory.createOne(Booking);
+exports.updateBooking = handlerFactory.updateOne(Booking);
+exports.deleteBooking = handlerFactory.deleteOne(Booking);

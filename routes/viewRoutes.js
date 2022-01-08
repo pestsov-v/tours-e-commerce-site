@@ -7,6 +7,7 @@ const {
   getLoginForm,
   getAccount,
   updateUserData,
+  getMyTours,
 } = require('../controllers/viewsController');
 const viewRoute = express.Router();
 
@@ -36,6 +37,7 @@ viewRoute.use(function (req, res, next) {
 
 viewRoute.get('/login', isLoggedIn, getLoginForm);
 viewRoute.get('/', createBookingCheckout, isLoggedIn, getOverview);
+viewRoute.get('/my-tours', protect, getMyTours);
 viewRoute.get('/tour/:slug', isLoggedIn, getTour);
 viewRoute.get('/me', protect, getAccount);
 
