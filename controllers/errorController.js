@@ -1,4 +1,4 @@
-const AppError = require('./../utils/appError');
+const AppError = require('./../utils');
 
 const handleCastErrorDB = (err) => {
   const message = `Не действительный ${err.path}: ${err.value}.`;
