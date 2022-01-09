@@ -19,7 +19,7 @@ mongoose
   })
   .then(() => console.log('Data base connection successful'));
 
-const PORT = 4000 || process.env.PORT;
+const PORT = process.env.PORT;
 const handleOpen = () => console.log(`Server is running...`);
 app.listen(PORT, handleOpen);
 
