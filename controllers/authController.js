@@ -47,7 +47,6 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 
   const url = `${req.protocol}://${req.get('host')}/me`;
-  console.log(url);
   await new Email(newUser, url).sendWelcome();
 
   createSendToken(newUser, 201, res);
@@ -102,7 +101,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  // console.log(req.cookies.jwt);
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   const currentUser = await User.findById(decoded.id);
@@ -146,7 +144,6 @@ exports.isLoggedIn = async (req, res, next) => {
       res.locals.user = currentUser;
       return next();
     } catch (e) {
-      console.log(e);
       return next();
     }
   }
