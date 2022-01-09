@@ -17,6 +17,7 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const viewRoutes = require('./routes/viewRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const compression = require('compression');
+const { webhookCheckout } = require('./controllers/bookingController');
 const app = express();
 
 app.enable('trust proxy');
@@ -49,6 +50,12 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter);
+
+app.post(
+  '/webhook-checkout',
+  bodyParser.raw({ type: 'application/json' }),
+  webhookCheckout
+);
 
 app.use(mongoSanitize());
 app.use(xss());
