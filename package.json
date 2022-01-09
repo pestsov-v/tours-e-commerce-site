@@ -4,6 +4,7 @@
   "description": "node js site",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
     "dev:server": "nodemon server.js",
     "prod:server": "NODE_ENV=production nodemon server.js",
     "debug": "ndb server.js",
