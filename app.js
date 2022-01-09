@@ -18,10 +18,11 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const compression = require('compression');
 const app = express();
 
+app.enable('trust proxy');
+
 app.use(cookieParser());
 app.use(express.json({ limit: '100kb' }));
 
-// app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.set('view engine', 'pug');
