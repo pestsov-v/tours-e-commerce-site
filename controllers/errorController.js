@@ -65,7 +65,6 @@ const sendErrorProd = (err, req, res) => {
   }
 
   if (err.isOperational) {
-    console.log(err);
     return res.status(err.statusCode).render('error', {
       title: 'Что-то пошло не так!',
       msg: err.message,
