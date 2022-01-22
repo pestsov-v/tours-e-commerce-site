@@ -1,0 +1,126 @@
+swagger: "2.0"
+info:
+  description: "Сервис для покупки туров"
+  version: "1.0.0"
+  title: "Natours"
+  contact:
+    email: "vladislav.pestsov@gmail.com"
+host: "localhost:4000"
+basePath: "/api/v1"
+schemes: 
+- "http"
+paths:
+  /users/signup:
+    post:
+      summary: "Регистрация нового пользователя"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/signupForm"
+      responses: 
+        201:
+          description: "Пользователь cоздан"
+          schema:
+            type: "object"
+            properties:
+              data: 
+                $ref: "#/definitions/Profile"
+        500: 
+          description: "Пользователь с таким email уже существует"
+          
+  /users/login:
+    post:
+      summary: "Авторизация пользователя на сайте"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema: 
+            $ref: "#/definitions/loginForm"
+      responses: 
+        200:
+          description: "Пользователь успешно зашел залогинился"
+          schema:
+            type: "object"
+            properties:
+              data: 
+                $ref: "#/definitions/loginForm"
+        401: 
+          description: "Неверный email или пароль"
+          
+  /users/me:
+    get:
+      summary: "Получение профиля пользователя, который залогинился"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Объект авторизации (пользователь)"
+          schema:
+            type: "object"
+            properties:
+              data:
+                $ref: "#/definitions/Profile"
+        401:
+          description: "Пользователь не авторизован" 
+      
+
+definitions:
+  signupForm:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "vladislav.test"
+      email:
+        type: "string"
+        example: "vladislav.test@gmail.com"
+      password:
+        type: "string"
+        example: "password123"
+      passwordConfirm:
+        type: "string"
+        example: "password123"
+        
+  loginForm:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+        example: "vladislav.test@gmail.com"
+      password:
+        type: "string"
+        example: "password123"
+  
+  Profile:
+    type: "object"
+    properties:
+      id: 
+        type: string
+        example: "61cb77d7567dc378ee45db42"
+      name: 
+        type: string
+        example: "vladislav.test"
+      email:
+        type: string
+        example: "vladislav.test@gmail.com"
+      role:
+        type: string
+        example: "user"
+      photo:
+        type: string
+        example: "url-string-photo.jpeg"
+      
+    

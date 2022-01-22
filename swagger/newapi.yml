@@ -1,0 +1,252 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /users/signup:
+    post:
+      summary: Регистрация нового пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/signupForm'
+        required: true
+      responses:
+        201:
+          description: Пользователь cоздан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/signupSuccessForm'
+        400:
+          description: Не все поля регистрации заполнены
+          content:
+            application/json:
+              schema:
+                    $ref: '#/components/schemas/signupErrorDublicateKey'
+        500:
+          description: Пользователь с таким email уже существует
+          content:
+            application/json:
+              schema: 
+                    $ref: '#/components/schemas/signupErrorEmptyField'
+      x-codegen-request-body-name: body
+      
+  /users/login:
+    post:
+      summary: Авторизация пользователя на сайте
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/loginForm'
+        required: true
+      responses:
+        200:
+          description: Пользователь успешно зашел залогинился
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                    data:
+                      $ref: '#/components/schemas/loginForm'
+        401:
+          description: Неверный email или пароль
+          content: {}
+      x-codegen-request-body-name: body
+  /users/me:
+    get:
+      summary: Получение профиля пользователя, который залогинился
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Объект авторизации (пользователь)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Profile'
+        401:
+          description: Пользователь не авторизован
+          content: {}
+          
+          
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    statusSuccess:
+      type: string
+      example: 'success'
+      
+    statusFail: 
+      type: string
+      example: fail
+      
+    statusError: 
+      type: string
+      example: error
+      
+    statusCodeError400: 
+      type: string
+      example: error
+      
+    statusCodeError409: 
+      type: string
+      example: error
+      
+    statusCodeError500: 
+      type: string
+      example: error
+      
+    token:
+      type: string
+      example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZWMwOWM3ZTUzMmFmNWRjOWRkYjM3NyIsImlhdCI6MTY0Mjg1ODk1MywiZXhwIjoxNjUwNjM0OTUzfQ.wmqNw6XP-OrSm3WUFBk6ZtD64vyrHaJiq0SwlAlFQTI"
+    
+    user:
+      type: object
+      properties:
+        name:
+          type: string
+          example: vladislav.test
+        email:
+          type: string
+          example: vladislav.test@gmail.com
+        photo:
+          type: string
+          example: url-string-photo.jpeg
+        role:
+          type: string
+          example: user
+        active: 
+          type: boolean
+          example: true
+        _id:
+          type: string
+          example: 61cb77d7567dc378ee45db42
+    
+    data: 
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/user'
+    
+    error:
+      type: object
+      properties:
+        index:
+          type: integer
+          example: 0
+        code:
+          type: integer
+          example: 11000
+        statusCode:
+          type: integer
+          example: 500
+        status:
+          type: string
+          example: "error"
+    
+    messageErrorDublicateKey:
+      type: string
+      example: "E11000 duplicate ker error collection: natours.users index: email_1 dup key"
+      
+    messageErrorEmptyField:
+      type: string
+      example: "Пожалуйста заполните все поля"
+          
+    signupForm:
+      type: object
+      properties:
+        name:
+          type: string
+          example: vladislav.test
+        email:
+          type: string
+          example: vladislav.test@gmail.com
+        password:
+          type: string
+          example: password123
+        passwordConfirm:
+          type: string
+          example: password123
+          
+    signupSuccessForm:
+      type: object
+      properties: 
+        status:
+          $ref: '#/components/schemas/statusSuccess'
+        token: 
+          $ref: '#/components/schemas/token'
+        data: 
+          $ref: '#/components/schemas/data'
+
+    signupErrorDublicateKey:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/statusError'
+        error:
+          $ref: '#/components/schemas/error'
+        message:
+          $ref: '#/components/schemas/messageErrorDublicateKey'
+
+    signupErrorEmptyField:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/statusFail'
+        error:
+          $ref: '#/components/schemas/statusCodeError400'
+        message:
+          $ref: '#/components/schemas/messageErrorEmptyField'
+
+    loginForm:
+      type: object
+      properties:
+        email:
+          type: string
+          example: vladislav.test@gmail.com
+        password:
+          type: string
+          example: password123
+          
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 61cb77d7567dc378ee45db42
+        name:
+          type: string
+          example: vladislav.test
+        email:
+          type: string
+          example: vladislav.test@gmail.com
+        role:
+          type: string
+          example: user
+        photo:
+          type: string
+          example: url-string-photo.jpeg
+        token: 
+          $ref: '#/components/schemas/statusSuccess'
+    
+    
+    
+      
+        

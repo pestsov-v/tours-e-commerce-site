@@ -35,19 +35,31 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
-    passwordChangedAt: req.body.passwordChangedAt,
-    role: req.body.role,
-  });
+  try {
+    const newUser = await User.create({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      passwordConfirm: req.body.passwordConfirm,
+      passwordChangedAt: req.body.passwordChangedAt,
+      role: req.body.role,
+    });
 
-  const url = `${req.protocol}://${req.get('host')}/me`;
-  await new Email(newUser, url).sendWelcome();
+    const url = `${req.protocol}://${req.get('host')}/me`;
+    await new Email(newUser, url).sendWelcome();
 
-  createSendToken(newUser, 201, req, res);
+    createSendToken(newUser, 201, req, res);
+  } catch (e) {
+    if (e.message.includes('E11000 duplicate key')) {
+      return next(
+        new AppError('Пользователь с данным Email уже существует', 409)
+      );
+    }
+
+    if (e.errors) {
+      return next(new AppError('Пожалуйста заполните все поля', 400));
+    }
+  }
 });
 
 exports.login = catchAsync(async (req, res, next) => {
