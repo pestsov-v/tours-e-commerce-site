@@ -1,0 +1,148 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /users/signup:
+    post:
+      summary: Регистрация нового пользователя
+      tags:
+        - authentification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/signupForm'
+        required: true
+      responses:
+        201:
+          description: Пользователь cоздан
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZWQ0NDJkNTM4ZjliYTJiMDA2ZGVmNiIsImlhdCI6MTY0MjkzOTQ0MCwiZXhwIjoxNjUwNzE1NDQwfQ.WIIJipOGDO2omBcHmCjfj2LQpSr5ZubD6-2ecKOzzLU'
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/signup_responses__200'
+        400:
+          description: Необходимо заполнить все поля формы
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/signup_responses__400'
+                
+        409:
+          description: Пользователь с таким email уже существует
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/signup_responses__409'
+     
+
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    signupForm:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Vladislav Pestsov
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+        password:
+          type: string
+          example: 12345678
+        passwordConfirm:
+          type: string
+          example: 12345678
+      required: 
+        - name
+        - example
+        - password
+        - passwordConfirm
+    
+    signup_responses__200:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Vladislav Pestsov
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+        photo:
+          type: string
+          example: default.jpg
+        role:
+          type: string
+          example: user
+        active:
+          type: boolean
+          example: true
+        _id:
+          type: string
+          example: 61ed442d538f9ba2b006def6
+          
+    signup_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пожалуйста заполните все поля
+        
+    signup_responses__409:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 409
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пользователь с данным Email уже существует

@@ -1,0 +1,138 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /users/login:
+      post:
+        security:
+          - bearerAuth: []
+        summary: Логирование пользователя на сайте
+        tags:
+          - authentification
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loginForm'
+          required: true
+        responses:
+          200:
+            description: Пользователь успешно вошел на сайт
+            content:
+              application/json:
+                schema:
+                  properties:
+                    status:
+                      type: string
+                      example: 'success'
+                    token:
+                      type: string
+                      example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZWQ0NDJkNTM4ZjliYTJiMDA2ZGVmNiIsImlhdCI6MTY0MjkzOTQ0MCwiZXhwIjoxNjUwNzE1NDQwfQ.WIIJipOGDO2omBcHmCjfj2LQpSr5ZubD6-2ecKOzzLU'
+                    data:
+                      type: object
+                      properties:
+                        user:
+                          $ref: '#/components/schemas/login_responses__200'
+          400:
+            description: Необходимо заполнить все поля формы
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/login_responses__400'
+                      
+          401:
+            description: Неверный логин или пароль вводимый пользователем
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/login_responses__401'
+
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    loginForm:
+      type: object
+      properties:
+        email: 
+          type: string
+          example: vladislav.pestsov@gmail.com
+        password:
+          type: string
+          example: 12345678
+          
+    login_responses__200:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 61ed442d538f9ba2b006def6
+        name:
+          type: string
+          example: Vladislav Pestsov
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+        role:
+          type: string
+          example: user
+        photo:
+          type: string
+          example: default.jpg
+        passwordChangedAt:
+          type: string
+          example: "2022-01-08T12:32:51.572Z"
+          
+    login_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пожалуйста заполните все поля
+          
+    login_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Неверный логин или пароль

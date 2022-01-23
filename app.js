@@ -10,6 +10,9 @@ const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const globalErrorHandler = require('./controllers/errorController');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const openapiSpecification = YAML.load('./swagger/auth/auth.routes.doc.yaml');
 
 const tourRoutes = require('./routes/tourRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -49,6 +52,7 @@ const limiter = rateLimit({
     'Слишком много запросов от этого IP, пожалуйста попробуйте через час!',
 });
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification));
 app.use('/api', limiter);
 
 app.post(
