@@ -1,0 +1,569 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /users/signup:
+    post:
+      summary: Регистрация нового пользователя
+      tags:
+        - authentification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/signupForm'
+        required: true
+      responses:
+        201:
+          description: Пользователь cоздан
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZWQ0NDJkNTM4ZjliYTJiMDA2ZGVmNiIsImlhdCI6MTY0MjkzOTQ0MCwiZXhwIjoxNjUwNzE1NDQwfQ.WIIJipOGDO2omBcHmCjfj2LQpSr5ZubD6-2ecKOzzLU'
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/signup_responses__200'
+        400:
+          description: Необходимо заполнить все поля формы
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/signup_responses__400'
+                
+        409:
+          description: Пользователь с таким email уже существует
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/signup_responses__409'
+
+  /users/login:
+    post:
+      summary: Логирование пользователя на сайте
+      tags:
+        - authentification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/loginForm'
+        required: true
+      responses:
+        200:
+          description: Пользователь успешно вошел на сайт
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZWQ0NDJkNTM4ZjliYTJiMDA2ZGVmNiIsImlhdCI6MTY0MjkzOTQ0MCwiZXhwIjoxNjUwNzE1NDQwfQ.WIIJipOGDO2omBcHmCjfj2LQpSr5ZubD6-2ecKOzzLU'
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/login_responses__200'
+        400:
+          description: Необходимо заполнить все поля формы
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/login_responses__400'
+                    
+        401:
+          description: Неверный логин или пароль вводимый пользователем
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/login_responses__401'
+           
+  /users/logout:
+    get:
+      summary: Выход пользователя со своей учётной записи
+      tags:
+        - authentification
+      responses:
+        200:
+          description: Пользователь cоздан
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'    
+                    
+  /users/forgotPassword:
+    post:
+      summary: Отправка на почту токен восстановления пароля
+      tags:
+        - authentification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/forgotPasswordForm'
+        required: true
+      responses:
+        200:
+          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  message:
+                    type: string
+                    example: Токен отправлен на почту
+        404:
+          description: Пользователя с данным Email не существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forgotPassword_responses__404'
+                
+  /users/resetPassword/{token}:
+    patch:
+      summary: Восстановления пароля по токену восстановления пароля
+      tags:
+        - authentification
+      parameters:
+          - in: path
+            name: token
+            schema:
+              type: string
+            required: true
+            description: Токен восстановления пароля
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/resetPasswordForm'
+      responses:
+        200:
+          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  message:
+                    type: string
+                    example: Токен отправлен на почту
+        400:
+          description: Пользователя с данным Email не существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resetPassword_responses__400'
+  
+  /users/updateMyPasssword:
+    patch:
+      summary: Изменение действующего пароля пользователя на другой
+      security:
+        - bearerAuth: []
+      tags:
+        - authentification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateMyPasswordForm'
+      responses:
+        200:
+          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/updateMyPassword_responses__200'
+        401:
+          description: Пользователя с данным Email не существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateMyPassword_responses__401'
+  /users:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение массива всех пользователей
+      tags:
+        - users
+      responses:
+        200:
+          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/users_responses_200'
+  
+  
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+  
+    signupForm:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Vladislav Pestsov
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+        password:
+          type: string
+          example: 12345678
+        passwordConfirm:
+          type: string
+          example: 12345678
+      required: 
+        - name
+        - example
+        - password
+        - passwordConfirm
+    
+    signup_responses__200:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Vladislav Pestsov
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+        photo:
+          type: string
+          example: default.jpg
+        role:
+          type: string
+          example: user
+        active:
+          type: boolean
+          example: true
+        _id:
+          type: string
+          example: 61ed442d538f9ba2b006def6
+          
+    signup_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пожалуйста заполните все поля
+        
+    signup_responses__409:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 409
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пользователь с данным Email уже существует
+  
+    
+    loginForm:
+      type: object
+      properties:
+        email: 
+          type: string
+          example: vladislav.pestsov@gmail.com
+        password:
+          type: string
+          example: 12345678
+          
+    login_responses__200:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 61ed442d538f9ba2b006def6
+        name:
+          type: string
+          example: Vladislav Pestsov
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+        role:
+          type: string
+          example: user
+        photo:
+          type: string
+          example: default.jpg
+        passwordChangedAt:
+          type: string
+          example: "2022-01-08T12:32:51.572Z"
+          
+    login_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пожалуйста заполните все поля
+          
+    login_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Неверный логин или пароль
+          
+    forgotPasswordForm:
+      type: object
+      properties:
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+    
+    forgotPassword_responses__404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Не существует пользователя с данным Email адресом
+          
+    resetPasswordForm:
+      type: object
+      properties:
+        password:
+          type: string
+          example: password123
+        passwordConfirm:
+          type: string
+          example: password123
+    
+    resetPassword_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Неверный токен или его срок годности истёк
+          
+    updateMyPasswordForm:
+      type: object
+      properties:
+        passwordCurrent:
+          type: string
+          example: 12345678
+        password:
+          type: string
+          example: password123
+        passwordConfirm:
+          type: string
+          example: password123
+    
+    
+    updateMyPassword_responses__200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        token: 
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxY2I3N2Q3NTY3ZGMzNzhlZTQ1ZGI0OSIsImlhdCI6MTY0MzAxOTExMCwiZXhwIjoxNjUwNzk1MTEwfQ.MweQr8JkzmLJW7TUHGcE6-xmFSJFotbSgexUhRb8yQ0
+        data: 
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/updateMyPassword_userForm_responses__200'
+    
+    updateMyPassword_userForm_responses__200:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 61cb77d7567dc378ee45db49
+        name:
+          type: string
+          example: Vladislav Pestsov
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+        role: 
+          type: string
+          example: user
+        photo:
+          type: string
+          example: user-61cb77d7567dc378ee45db49-1641489907686.jpeg
+        passwordChangedAt:
+          type: string
+          example: 2022-01-24T10:11:49.508Z
+        passwordResetExpires:
+          type: string
+          example: 2022-01-24T10:04:24.573Z
+        passwordResetToken:
+          type: string
+          example: 8759a136a875295aeafe65fc56a404d68d327761d1d70e38e7982bfc90ce0ca0
+    
+    
+    updateMyPassword_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Ваш текущий пароль не верный
+          
+    users_responses_200:
+      type: array
+      items:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              data: 
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 61cb77aa567dc378ee45db47
+                    name:
+                      type: string
+                      example: Vladislav Pestsov
+                    email:
+                      type: string
+                      example: vladislav.pestsov@gmail.com
+                    role:
+                      type: string
+                      example: user
+                    photo:
+                      type: string
+                      example: user-5.jpg
+    

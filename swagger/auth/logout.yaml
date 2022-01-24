@@ -1,0 +1,27 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /users/logout:
+    get:
+      summary: Выход пользователя со своей учётной записи
+      tags:
+        - authentification
+      responses:
+        200:
+          description: Пользователь cоздан
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  
+    

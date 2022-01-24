@@ -12,7 +12,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
-const openapiSpecification = YAML.load('./swagger/auth/auth.routes.doc.yaml');
+const openapiSpecification = YAML.load('./swagger/allDocumentation.yaml');
 
 const tourRoutes = require('./routes/tourRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -21,6 +21,7 @@ const viewRoutes = require('./routes/viewRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const compression = require('compression');
 const { webhookCheckout } = require('./controllers/bookingController');
+const AppErorr = require('./utils/appError');
 const app = express();
 
 app.enable('trust proxy');
@@ -86,7 +87,7 @@ app.use('/api/v1/bookings', bookingRoutes);
 
 app.all('*', (req, res, next) => {
   next(
-    new AppError(`Не удалось найти путь ${req.originalUrl} на сервере!`, 404)
+    new AppErorr(`Не удалось найти путь ${req.originalUrl} на сервере!`, 404)
   );
 });
 

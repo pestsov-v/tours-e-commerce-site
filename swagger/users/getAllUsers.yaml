@@ -1,0 +1,68 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /users:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение массива всех пользователей
+      tags:
+        - users
+      responses:
+        200:
+          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/users_responses_200'
+                        
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    
+    users_responses_200:
+      type: array
+      items:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              data: 
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 61cb77aa567dc378ee45db47
+                    name:
+                      type: string
+                      example: Vladislav Pestsov
+                    email:
+                      type: string
+                      example: vladislav.pestsov@gmail.com
+                    role:
+                      type: string
+                      example: user
+                    photo:
+                      type: string
+                      example: user-5.jpg
+    
