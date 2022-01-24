@@ -1,0 +1,97 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /users/me:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение профиля пользователя
+      tags:
+        - users
+      responses:
+        200:
+          description: Получение данных профиля пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/me_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/me_responses_401'
+                        
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    me_responses_200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            data: 
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 61cb77aa567dc378ee45db47
+                  name:
+                    type: string
+                    example: Vladislav Pestsov
+                  email:
+                    type: string
+                    example: vladislav.pestsov@gmail.com
+                  role:
+                    type: string
+                    example: user
+                  photo:
+                    type: string
+                    example: user-61cb77d7567dc378ee45db49-1641489907686.jpeg
+                  passwordChangedAt:
+                    type: string
+                    example: '2022-01-24T10:11:49.508Z'
+                  passwordResetExpires:
+                    type: string
+                    example: '2022-01-24T10:04:24.573Z'
+                  passwordResetToken:
+                    type: string
+                    example: 8759a136a875295aeafe65fc56a404d68d327761d1d70e38e7982bfc90ce0ca0
+                  
+    me_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись

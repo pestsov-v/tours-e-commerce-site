@@ -21,7 +21,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/users_responses_200'
+                $ref: '#/components/schemas/getAllUsers_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllUsers_responses_401'
                         
 components:
   securitySchemes:
@@ -32,7 +38,7 @@ components:
       
   schemas:
     
-    users_responses_200:
+    getAllUsers_responses_200:
       type: array
       items:
         type: object
@@ -65,4 +71,27 @@ components:
                     photo:
                       type: string
                       example: user-5.jpg
+
+    getAllUsers_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
     

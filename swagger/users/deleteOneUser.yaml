@@ -1,0 +1,75 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /users/{id}:
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление пользователя
+      tags:
+          - users
+      parameters:
+          - in: path
+            name: id
+            schema:
+              type: string
+            required: true
+            description: ID пользователя, который будет удалён
+      responses:
+        204:
+          description: Пользователь успешно удалён
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  data:
+                    type: string
+                    example: null
+        404:
+          description: Нет пользователя с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resetPassword_responses__400'
+          
+        
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    
+    resetPassword_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID

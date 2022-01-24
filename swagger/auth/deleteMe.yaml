@@ -1,0 +1,98 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /users/deleteMe:
+      delete:
+        security:
+          - bearerAuth: []
+        summary: Удаление пользователя
+        tags:
+          - authentification
+        responses:
+          204:
+            description: Аккаунт пользователя успешно деактивирован
+            content:
+              application/json:
+                schema:
+                  properties:
+                    status:
+                      type: string
+                      example: 'success'
+                    data:
+                      type: string
+                      example: null
+          401:
+            description: Токен, который принадлежит пользователю, больше не сущесвует
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/deleteMe_responses__401'
+                      
+          403:
+            description: Ошибка возникает если пользователь не обладает достаточными правами для совершения подобных действий
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/deleteMe_responses__403'
+
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    deleteMe_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Токен, который Вам принадлежит, больше не существует.
+      
+    deleteMe_responses__403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не обладаете достаточными права для сорвершения подобных действий.
+
+          
+    
