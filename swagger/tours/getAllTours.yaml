@@ -10,24 +10,52 @@ servers:
 paths:
   /users:
     get:
+      parameters:
+        - in: query
+          name: duration
+          example: duration[gte]=5
+          schema:
+            type: integer
+          description: Больше или равно указаного количества дней которые занимает тур. Доступны следующие фильтры - 
+            1. [gte] - больше или равно указаного количества. 
+            2. [gt]- больше указаного количества. 
+            3. [lte] - меньше или равно указаного количества.
+            4. [lt]- меньше указаного количества людей.
+        - in: query
+          name: sort
+          example: sort=maxGroupSize  
+          schema:
+            type: string
+          description: Сортирует массив туров в зависимости от параметра сортировки. По умолчанию сортировка от меньшей стоимости к большей, чтобы инверсировать сортировку необходимо ввести вместо "sort=maxGroupSize" - "sort=maxGroupSize-1". Доступны следующие параметры сортировки - 
+            1. price - сортировка по цене. 
+            2. duration - сортировка по количеству дней продолжительности тура. 
+            3. maxGroupSize - сортировка по количеству людей в одной групе.
+            4. difficulty - сложность тура.
+            5. ratingsQuantity - рейтинг тура
+        - in: query
+          name: limit
+          example: limit=8
+          schema:
+            type: number
+          description: Пагинация необходимого количество туров
       security:
         - bearerAuth: []
-      summary: Получение массива всех пользователей
+      summary: Получение массива всех туров
       tags:
-        - users
+        - tours
       responses:
         200:
-          description: Получение массива всех пользователей
+          description: Получение массива всех туров
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getAllUsers_responses_200'
+                $ref: '#/components/schemas/getAllTours_responses_200'
         401:
           description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getAllUsers_responses_401'
+                $ref: '#/components/schemas/getAllTours_responses_401'
                         
 components:
   securitySchemes:
@@ -38,7 +66,7 @@ components:
       
   schemas:
     
-    getAllUsers_responses_200:
+    getAllTours_responses_200:
       type: array
       items:
         type: object
@@ -72,7 +100,7 @@ components:
                       type: string
                       example: user-5.jpg
 
-    getAllUsers_responses_401:
+    getAllTours_responses_401:
       type: object
       properties:
         status:

@@ -203,6 +203,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/updateMyPassword_responses__401'
+                
+  /users/deleteMe:
+      delete:
+        security:
+          - bearerAuth: []
+        summary: Деактивация пользователя
+        tags:
+          - authentification
+        responses:
+          204:
+            description: Аккаунт пользователя успешно деактивирован
+            content:
+              application/json:
+                schema:
+                  properties:
+                    status:
+                      type: string
+                      example: 'success'
+                    data:
+                      type: string
+                      example: null
+          401:
+            description: Токен, который принадлежит пользователю, больше не сущесвует
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/deleteMe_responses__401'
+                      
+          403:
+            description: Ошибка возникает если пользователь не обладает достаточными правами для совершения подобных действий
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/deleteMe_responses__403'
+  
   /users:
     get:
       security:
@@ -212,12 +247,66 @@ paths:
         - users
       responses:
         200:
-          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          description: Получение массива всех пользователей
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/users_responses_200'
   
+  /users/me:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение профиля пользователя
+      tags:
+        - users
+      responses:
+        200:
+          description: Получение данных профиля пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/me_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/me_responses_401'
+                
+  /users/{id}:
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление пользователя
+      tags:
+          - users
+      parameters:
+          - in: path
+            name: id
+            schema:
+              type: string
+            required: true
+            description: ID пользователя, который будет удалён
+      responses:
+        204:
+          description: Пользователь успешно удалён
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  data:
+                    type: string
+                    example: null
+        404:
+          description: Нет пользователя с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteUser_responses__400'
   
 components:
   securitySchemes:
@@ -533,6 +622,50 @@ components:
           type: string
           example: Ваш текущий пароль не верный
           
+    deleteMe_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Токен, который Вам принадлежит, больше не существует.
+      
+    deleteMe_responses__403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не обладаете достаточными права для сорвершения подобных действий.      
+          
     users_responses_200:
       type: array
       items:
@@ -567,3 +700,83 @@ components:
                       type: string
                       example: user-5.jpg
     
+    me_responses_200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            data: 
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 61cb77aa567dc378ee45db47
+                  name:
+                    type: string
+                    example: Vladislav Pestsov
+                  email:
+                    type: string
+                    example: vladislav.pestsov@gmail.com
+                  role:
+                    type: string
+                    example: user
+                  photo:
+                    type: string
+                    example: user-61cb77d7567dc378ee45db49-1641489907686.jpeg
+                  passwordChangedAt:
+                    type: string
+                    example: '2022-01-24T10:11:49.508Z'
+                  passwordResetExpires:
+                    type: string
+                    example: '2022-01-24T10:04:24.573Z'
+                  passwordResetToken:
+                    type: string
+                    example: 8759a136a875295aeafe65fc56a404d68d327761d1d70e38e7982bfc90ce0ca0
+                  
+    me_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    deleteUser_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
