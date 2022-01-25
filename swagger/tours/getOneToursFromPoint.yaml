@@ -1,0 +1,114 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /tours/distances/{latlng}/unit/{unit}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение расстояния ко всем турам относительно точки указаной на карте 
+      tags:
+          - tours
+      parameters:
+          - in: path
+            name: latlng
+            schema:
+              type: string
+            required: true
+            description: Долгота и широта определённой точки на карте. Первым параметром указывается широта, вторым - долгота
+            example: distances/34.058, -118.256
+          - in: path
+            name: unit
+            schema:
+              type: string
+            required: true
+            description: Единица измерения расстояния радиуса диапазона относительно определённой точки. Доступны 2 вида исчисления. Если радиус указывается в милях, необходимо указать "mi". Если радиус указывается в километрах, необходимо указать "km"
+            example: distances/34.058, -118.256/unit/mi
+            
+      responses:
+        204:
+          description: Результат расстояния от точки к каждому существующему туру
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  results:
+                    type: number
+                    example: 1
+                  data:
+                    $ref: '#/components/schemas/getDistances_responses__200'
+        
+        400:
+          description: ss
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getTourWithin_responses_400'
+                  
+                    
+        404:
+          description: Нет пользователя с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getTourWithin_responses__404'
+          
+        
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    getDistances_responses__200:
+      type: object
+      properties:
+        data: 
+          type: array
+          items:
+              type: object
+              properties:
+                _id:
+                  type: string
+                  example: 5c88fa8cf4afda39709c2966
+                name:
+                  type: string
+                  example: Северное сияние
+                distance:
+                  type: number
+                  format: float
+                  example: 31.587032474139185
+                    
+    
+    getTourWithin_responses_400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: error
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пожалуйста приведите формат широты и долготы в формат "lat, lng"

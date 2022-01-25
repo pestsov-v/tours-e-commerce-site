@@ -1,0 +1,235 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /tours/{id}:
+    get:
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID определённого тура
+      security:
+        - bearerAuth: []
+      summary: Получение определённого тура по его ID
+      tags:
+        - tours
+      responses:
+        200:
+          description: Получение данных определенного тура по его ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneTour_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneTour_responses_401'
+                        
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    getOneTour_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          data:
+            type: object
+            properties:
+              data: 
+                type: object
+                properties:
+                  startLocation:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: Point
+                      coordinates:
+                          type: number
+                          example: 
+                            - -122.29286 
+                            - 38.294065
+                      address: 
+                        type: string
+                        example: 560 Jefferson St, Napa, CA 94559, USA
+                      description:
+                        type: string
+                        example: Калифорния, США
+                  _id:
+                    type: string
+                    example: 61ef23ea06fef028bfa6a073
+                  name: 
+                    type: string
+                    example: Морские исследования
+                  duration:
+                    type: number
+                    example: 7
+                  maxGroupSize:
+                    type: number
+                    example: 15
+                  difficulty:
+                    type: string
+                    example: Средняя
+                  ratingsAverage:
+                    type: number
+                    example: 5
+                  ratingsQuantity:
+                    type: number
+                    format: float
+                    example: 3.7
+                  price: 
+                    type: number
+                    example: 497
+                  summary: 
+                    type: string
+                    example: Изучайте потрясающее восточнее побережье США пешком и на лодке.
+                  description: 
+                    type: string
+                    example: Первоначально называвшийся Royal Palm Park, Bayfront Park был первым общественным местом для встреч общины Большого Майами. Парк был построен в 1896 году, и в нем не было ничего, кроме павильона и зеленой зоны, которую посетители использовали для игр в бейсбол и легкой атлетики. /n Позднее была добавлена бандана, и парк часто использовался для проведения спортивных соревнований, культурных и религиозных мероприятий, политических мероприятий и многого другого. После многократного расширения за годы, парк Bayfront теперь занимает 32 акра в самом центре Майами и находится прямо на берегу залива Бискейн. Этот культовый парк идеально подходит для семей, которые хотят расслабиться, поиграть или потренироваться. /n В этом легендарном парке есть открытые лужайки, широкая набережная, извилистые дорожки, песчаный пляж, потрясающий фонтан, площадки для выступлений со специальным освещением и зоны отдыха для VIP-гостей, тропическая скала сад, водопад 1926 года и многое другое.
+                  imageCover: 
+                    type: string
+                    example: tour-2-cover.jpg
+                  images:
+                    type: string
+                    example:
+                      - tour-2-1.jpg
+                      - tour-2-2.jpg
+                      - tour-2-3.jpg
+                  startDates:
+                    type: string
+                    example:
+                      - "2021-06-19T09:00:00.000Z"
+                      - "2021-07-20T09:00:00.000Z"
+                      - "2021-08-18T09:00:00.000Z"
+                  secretTour:
+                    type: boolean
+                    example: false
+                  locations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: Point
+                        coordinates:
+                            type: number
+                            example: 
+                              - -122.29286 
+                              - 38.294065
+                        description: 
+                          type: string
+                          example: Луммус пляж
+                        day:
+                          type: number
+                          example: 1
+                        _id: 
+                          type: string
+                          example: 5c88fa8cf4afda39709c2959
+                  guides:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61cb7930567dc378ee45db55
+                        name:
+                            type: string
+                            example: Наталья Величко
+                        email: 
+                          type: string
+                          example: natalia.veluchko@gmail.com
+                        role:
+                          type: string
+                          example: lead-guide
+                        photo: 
+                          type: string
+                          example: user-8.jpg
+                  slug:
+                    type: string
+                    example: morskie-issledovaniya
+                  reviews: 
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61d2e7ba84c8757c2abbdcfd
+                        review:
+                          type: string
+                          example: Гид запрещал пить водочку. Как можно купаться трезвым!? Не доволен
+                        rating:
+                          type: number
+                          example: 1
+                        tour:
+                          type: string
+                          example: 5c88fa8cf4afda39709c2955
+                        user:
+                          type: object
+                          properties:
+                            _id: 
+                              type: string
+                              example: 61cb77e8567dc378ee45db4b
+                            name:
+                              type: string
+                              example: Vladislav Zelenskiy
+                            photo:
+                              type: string
+                              example: user-11.jpg
+                        createdAt:
+                          type: string
+                          example: 2022-01-03T12:10:34.273Z
+                        id: 
+                          type: string
+                          example: 61d2e7ba84c8757c2abbdcfd
+                  durationWeeks:
+                    type: number
+                    example: 1
+                  id:
+                    type: string
+                    example: 5c88fa8cf4afda39709c2955
+                      
+                      
+    getOneTour_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    

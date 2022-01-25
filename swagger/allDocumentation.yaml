@@ -307,7 +307,252 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/deleteUser_responses__400'
+  /tours:
+    get:
+      parameters:
+        - in: query
+          name: duration
+          example: duration[gte]=5
+          schema:
+            type: integer
+          description: Больше или равно указаного количества дней которые занимает тур. Доступны следующие фильтры - 
+            1. [gte] - больше или равно указаного количества. 
+            2. [gt]- больше указаного количества. 
+            3. [lte] - меньше или равно указаного количества.
+            4. [lt]- меньше указаного количества людей.
+        - in: query
+          name: sort
+          example: sort=maxGroupSize  
+          schema:
+            type: string
+          description: Сортирует массив туров в зависимости от параметра сортировки. По умолчанию сортировка от меньшей стоимости к большей, чтобы инверсировать сортировку необходимо ввести вместо "sort=maxGroupSize" - "sort=maxGroupSize-1". Доступны следующие параметры сортировки - 
+            1. price - сортировка по цене. 
+            2. duration - сортировка по количеству дней продолжительности тура. 
+            3. maxGroupSize - сортировка по количеству людей в одной групе.
+            4. difficulty - сложность тура.
+            5. ratingsQuantity - рейтинг тура
+        - in: query
+          name: limit
+          example: limit=8
+          schema:
+            type: number
+          description: Пагинация необходимого количество туров.  
+      security:
+        - bearerAuth: []
+      summary: Получение массива всех туров
+      tags:
+        - tours
+      responses:
+        200:
+          description: Получение массива всех туров
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllTours_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllTours_responses_401'
   
+    post:
+      security:
+        - bearerAuth: []
+      summary: Получение определённого тура по его ID
+      tags:
+        - tours
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createOneTourForm'
+        required: true
+      responses:
+        200:
+          description: Получение данных определенного тура по его ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneTour_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneTour_responses_401'
+        
+        500:
+          description: Ошибка появляется если тур с данным именем уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneTour_responses_500'
+                
+  /tours/{id}:
+    get:
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID определённого тура
+      security:
+        - bearerAuth: []
+      summary: Получение определённого тура по его ID
+      tags:
+        - tours
+      responses:
+        200:
+          description: Получение данных определенного тура по его ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneTour_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneTour_responses_401'
+                
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление одного тура
+      tags:
+          - tours
+      parameters:
+          - in: path
+            name: id
+            schema:
+              type: string
+            required: true
+            description: ID тура, который будет удалён
+      responses:
+        204:
+          description: Тур успешно удалён
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  data:
+                    type: string
+                    example: null
+        404:
+          description: Нет пользователя с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneTour_responses__400'
+
+  /tours/distances/{latlng}/unit/{unit}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение расстояния ко всем турам относительно точки указаной на карте 
+      tags:
+          - tours
+      parameters:
+          - in: path
+            name: latlng
+            schema:
+              type: string
+            required: true
+            description: Долгота и широта определённой точки на карте. Первым параметром указывается широта, вторым - долгота
+            example: distances/34.058, -118.256
+          - in: path
+            name: unit
+            schema:
+              type: string
+            required: true
+            description: Единица измерения расстояния радиуса диапазона относительно определённой точки. Доступны 2 вида исчисления. Если радиус указывается в милях, необходимо указать "mi". Если радиус указывается в километрах, необходимо указать "km"
+            example: distances/34.058, -118.256/unit/mi
+            
+      responses:
+        204:
+          description: Результат расстояния от точки к каждому существующему туру
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  results:
+                    type: number
+                    example: 1
+                  data:
+                    $ref: '#/components/schemas/getDistances_responses__200'
+        
+        400:
+          description: ss
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getDistances_responses_400'
+  
+  
+  /tours/tours-within/{distances}/center/{latlng}/unit/{unit}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение всех туров в желаемом диапазоне расстояния относительно определённой точки на карте 
+      tags:
+          - tours
+      parameters:
+          - in: path
+            name: distances
+            schema:
+              type: number
+            required: true
+            description: Размер радиуса диапазона относительно определённой точки на карте
+            example: tours-within/115
+          - in: path
+            name: latlng
+            schema:
+              type: string
+            required: true
+            description: Долгота и широта определённой точки на карте. Первым параметром указывается широта, вторым - долгота
+            example: tours-within/115/center/34.058, -118.256
+          - in: path
+            name: unit
+            schema:
+              type: string
+            required: true
+            description: Единица измерения расстояния радиуса диапазона относительно определённой точки. Доступны 2 вида исчисления. Если радиус указывается в милях, необходимо указать "mi". Если радиус указывается в километрах, необходимо указать "km"
+            example: tours-within/115/center/34.058, -118.256/unit/mi
+            
+      
+      responses:
+        204:
+          description: Результат всех найденых в радиусе туров
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  results:
+                    type: number
+                    example: 1
+                  data:
+                    $ref: '#/components/schemas/getTourWithin_responses__200'
+        
+        400:
+          description: Не приведёт формат широты и долготы в формат "lat, lng"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getTourWithin_responses_400'
+  
+  
+                    
 components:
   securitySchemes:
     bearerAuth: 
@@ -760,6 +1005,799 @@ components:
           example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
     
     deleteUser_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
+          
+    getAllTours_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              data: 
+                type: array
+                items:
+                    type: object
+                    properties:
+                      startLocation:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            example: Point
+                          coordinates:
+                              type: number
+                              example: 
+                                - -122.29286 
+                                - 38.294065
+                          address: 
+                            type: string
+                            example: 560 Jefferson St, Napa, CA 94559, USA
+                          description:
+                            type: string
+                            example: Калифорния, США
+                      _id:
+                        type: string
+                        example: 61ef23ea06fef028bfa6a073
+                      name: 
+                        type: string
+                        example: Морские исследования
+                      duration:
+                        type: number
+                        example: 7
+                      maxGroupSize:
+                        type: number
+                        example: 15
+                      difficulty:
+                        type: string
+                        example: Средняя
+                      ratingsAverage:
+                        type: number
+                        example: 5
+                      ratingsQuantity:
+                        type: number
+                        format: float
+                        example: 3.7
+                      price: 
+                        type: number
+                        example: 497
+                      summary: 
+                        type: string
+                        example: Изучайте потрясающее восточнее побережье США пешком и на лодке.
+                      description: 
+                        type: string
+                        example: Первоначально называвшийся Royal Palm Park, Bayfront Park был первым общественным местом для встреч общины Большого Майами. Парк был построен в 1896 году, и в нем не было ничего, кроме павильона и зеленой зоны, которую посетители использовали для игр в бейсбол и легкой атлетики. /n Позднее была добавлена бандана, и парк часто использовался для проведения спортивных соревнований, культурных и религиозных мероприятий, политических мероприятий и многого другого. После многократного расширения за годы, парк Bayfront теперь занимает 32 акра в самом центре Майами и находится прямо на берегу залива Бискейн. Этот культовый парк идеально подходит для семей, которые хотят расслабиться, поиграть или потренироваться. /n В этом легендарном парке есть открытые лужайки, широкая набережная, извилистые дорожки, песчаный пляж, потрясающий фонтан, площадки для выступлений со специальным освещением и зоны отдыха для VIP-гостей, тропическая скала сад, водопад 1926 года и многое другое.
+                      imageCover: 
+                        type: string
+                        example: tour-2-cover.jpg
+                      images:
+                        type: string
+                        example:
+                          - tour-2-1.jpg
+                          - tour-2-2.jpg
+                          - tour-2-3.jpg
+                      startDates:
+                        type: string
+                        example:
+                          - "2021-06-19T09:00:00.000Z"
+                          - "2021-07-20T09:00:00.000Z"
+                          - "2021-08-18T09:00:00.000Z"
+                      secretTour:
+                        type: boolean
+                        example: false
+                      locations:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              example: Point
+                            coordinates:
+                                type: number
+                                example: 
+                                  - -122.29286 
+                                  - 38.294065
+                            description: 
+                              type: string
+                              example: Луммус пляж
+                            day:
+                              type: number
+                              example: 1
+                            _id: 
+                              type: string
+                              example: 5c88fa8cf4afda39709c2959
+                      guides:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
+                              example: 61cb7930567dc378ee45db55
+                            name:
+                                type: string
+                                example: Наталья Величко
+                            email: 
+                              type: string
+                              example: natalia.veluchko@gmail.com
+                            role:
+                              type: string
+                              example: lead-guide
+                            photo: 
+                              type: string
+                              example: user-8.jpg
+                      slug:
+                        type: string
+                        example: morskie-issledovaniya
+                      reviews: 
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
+                              example: 61d2e7ba84c8757c2abbdcfd
+                            review:
+                              type: string
+                              example: Гид запрещал пить водочку. Как можно купаться трезвым!? Не доволен
+                            rating:
+                              type: number
+                              example: 1
+                            tour:
+                              type: string
+                              example: 5c88fa8cf4afda39709c2955
+                            user:
+                              type: object
+                              properties:
+                                _id: 
+                                  type: string
+                                  example: 61cb77e8567dc378ee45db4b
+                                name:
+                                  type: string
+                                  example: Vladislav Zelenskiy
+                                photo:
+                                  type: string
+                                  example: user-11.jpg
+                            createdAt:
+                              type: string
+                              example: 2022-01-03T12:10:34.273Z
+                            id: 
+                              type: string
+                              example: 61d2e7ba84c8757c2abbdcfd
+                      durationWeeks:
+                        type: number
+                        example: 1
+                      id:
+                        type: string
+                        example: 5c88fa8cf4afda39709c2955
+                      
+                      
+    getAllTours_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+          
+    getOneTour_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          data:
+            type: object
+            properties:
+              data: 
+                type: object
+                properties:
+                  startLocation:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: Point
+                      coordinates:
+                          type: number
+                          example: 
+                            - -122.29286 
+                            - 38.294065
+                      address: 
+                        type: string
+                        example: 560 Jefferson St, Napa, CA 94559, USA
+                      description:
+                        type: string
+                        example: Калифорния, США
+                  _id:
+                    type: string
+                    example: 61ef23ea06fef028bfa6a073
+                  name: 
+                    type: string
+                    example: Морские исследования
+                  duration:
+                    type: number
+                    example: 7
+                  maxGroupSize:
+                    type: number
+                    example: 15
+                  difficulty:
+                    type: string
+                    example: Средняя
+                  ratingsAverage:
+                    type: number
+                    example: 5
+                  ratingsQuantity:
+                    type: number
+                    format: float
+                    example: 3.7
+                  price: 
+                    type: number
+                    example: 497
+                  summary: 
+                    type: string
+                    example: Изучайте потрясающее восточнее побережье США пешком и на лодке.
+                  description: 
+                    type: string
+                    example: Первоначально называвшийся Royal Palm Park, Bayfront Park был первым общественным местом для встреч общины Большого Майами. Парк был построен в 1896 году, и в нем не было ничего, кроме павильона и зеленой зоны, которую посетители использовали для игр в бейсбол и легкой атлетики. /n Позднее была добавлена бандана, и парк часто использовался для проведения спортивных соревнований, культурных и религиозных мероприятий, политических мероприятий и многого другого. После многократного расширения за годы, парк Bayfront теперь занимает 32 акра в самом центре Майами и находится прямо на берегу залива Бискейн. Этот культовый парк идеально подходит для семей, которые хотят расслабиться, поиграть или потренироваться. /n В этом легендарном парке есть открытые лужайки, широкая набережная, извилистые дорожки, песчаный пляж, потрясающий фонтан, площадки для выступлений со специальным освещением и зоны отдыха для VIP-гостей, тропическая скала сад, водопад 1926 года и многое другое.
+                  imageCover: 
+                    type: string
+                    example: tour-2-cover.jpg
+                  images:
+                    type: string
+                    example:
+                      - tour-2-1.jpg
+                      - tour-2-2.jpg
+                      - tour-2-3.jpg
+                  startDates:
+                    type: string
+                    example:
+                      - "2021-06-19T09:00:00.000Z"
+                      - "2021-07-20T09:00:00.000Z"
+                      - "2021-08-18T09:00:00.000Z"
+                  secretTour:
+                    type: boolean
+                    example: false
+                  locations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: Point
+                        coordinates:
+                            type: number
+                            example: 
+                              - -122.29286 
+                              - 38.294065
+                        description: 
+                          type: string
+                          example: Луммус пляж
+                        day:
+                          type: number
+                          example: 1
+                        _id: 
+                          type: string
+                          example: 5c88fa8cf4afda39709c2959
+                  guides:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61cb7930567dc378ee45db55
+                        name:
+                            type: string
+                            example: Наталья Величко
+                        email: 
+                          type: string
+                          example: natalia.veluchko@gmail.com
+                        role:
+                          type: string
+                          example: lead-guide
+                        photo: 
+                          type: string
+                          example: user-8.jpg
+                  slug:
+                    type: string
+                    example: morskie-issledovaniya
+                  reviews: 
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61d2e7ba84c8757c2abbdcfd
+                        review:
+                          type: string
+                          example: Гид запрещал пить водочку. Как можно купаться трезвым!? Не доволен
+                        rating:
+                          type: number
+                          example: 1
+                        tour:
+                          type: string
+                          example: 5c88fa8cf4afda39709c2955
+                        user:
+                          type: object
+                          properties:
+                            _id: 
+                              type: string
+                              example: 61cb77e8567dc378ee45db4b
+                            name:
+                              type: string
+                              example: Vladislav Zelenskiy
+                            photo:
+                              type: string
+                              example: user-11.jpg
+                        createdAt:
+                          type: string
+                          example: 2022-01-03T12:10:34.273Z
+                        id: 
+                          type: string
+                          example: 61d2e7ba84c8757c2abbdcfd
+                  durationWeeks:
+                    type: number
+                    example: 1
+                  id:
+                    type: string
+                    example: 5c88fa8cf4afda39709c2955
+                      
+                      
+    getOneTour_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную 
+          
+    getDistances_responses__200:
+        type: object
+        properties:
+          data: 
+            type: array
+            items:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 5c88fa8cf4afda39709c2966
+                  name:
+                    type: string
+                    example: Северное сияние
+                  distance:
+                    type: number
+                    format: float
+                    example: 31.587032474139185
+                      
+    getDistances_responses_400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: error
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пожалуйста приведите формат широты и долготы в формат "lat, lng"
+    
+    getTourWithin_responses__200:
+      type: object
+      properties:
+        data: 
+          type: array
+          items:
+              type: object
+              properties:
+                startLocation:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      example: Point
+                    coordinates:
+                        type: number
+                        example: 
+                          - -122.29286 
+                          - 38.294065
+                    address: 
+                      type: string
+                      example: 560 Jefferson St, Napa, CA 94559, USA
+                    description:
+                      type: string
+                      example: Калифорния, США
+                _id:
+                  type: string
+                  example: 61ef23ea06fef028bfa6a073
+                name: 
+                  type: string
+                  example: Морские исследования
+                duration:
+                  type: number
+                  example: 7
+                maxGroupSize:
+                  type: number
+                  example: 15
+                difficulty:
+                  type: string
+                  example: Средняя
+                ratingsAverage:
+                  type: number
+                  example: 5
+                ratingsQuantity:
+                  type: number
+                  format: float
+                  example: 3.7
+                price: 
+                  type: number
+                  example: 497
+                summary: 
+                  type: string
+                  example: Изучайте потрясающее восточнее побережье США пешком и на лодке.
+                description: 
+                  type: string
+                  example: Первоначально называвшийся Royal Palm Park, Bayfront Park был первым общественным местом для встреч общины Большого Майами. Парк был построен в 1896 году, и в нем не было ничего, кроме павильона и зеленой зоны, которую посетители использовали для игр в бейсбол и легкой атлетики. /n Позднее была добавлена бандана, и парк часто использовался для проведения спортивных соревнований, культурных и религиозных мероприятий, политических мероприятий и многого другого. После многократного расширения за годы, парк Bayfront теперь занимает 32 акра в самом центре Майами и находится прямо на берегу залива Бискейн. Этот культовый парк идеально подходит для семей, которые хотят расслабиться, поиграть или потренироваться. /n В этом легендарном парке есть открытые лужайки, широкая набережная, извилистые дорожки, песчаный пляж, потрясающий фонтан, площадки для выступлений со специальным освещением и зоны отдыха для VIP-гостей, тропическая скала сад, водопад 1926 года и многое другое.
+                imageCover: 
+                  type: string
+                  example: tour-2-cover.jpg
+                images:
+                  type: string
+                  example:
+                    - tour-2-1.jpg
+                    - tour-2-2.jpg
+                    - tour-2-3.jpg
+                startDates:
+                  type: string
+                  example:
+                    - "2021-06-19T09:00:00.000Z"
+                    - "2021-07-20T09:00:00.000Z"
+                    - "2021-08-18T09:00:00.000Z"
+                secretTour:
+                  type: boolean
+                  example: false
+                locations:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: Point
+                      coordinates:
+                          type: number
+                          example: 
+                            - -122.29286 
+                            - 38.294065
+                      description: 
+                        type: string
+                        example: Луммус пляж
+                      day:
+                        type: number
+                        example: 1
+                      _id: 
+                        type: string
+                        example: 5c88fa8cf4afda39709c2959
+                guides:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 61cb7930567dc378ee45db55
+                      name:
+                          type: string
+                          example: Наталья Величко
+                      email: 
+                        type: string
+                        example: natalia.veluchko@gmail.com
+                      role:
+                        type: string
+                        example: lead-guide
+                      photo: 
+                        type: string
+                        example: user-8.jpg
+                slug:
+                  type: string
+                  example: morskie-issledovaniya
+                reviews: 
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 61d2e7ba84c8757c2abbdcfd
+                      review:
+                        type: string
+                        example: Гид запрещал пить водочку. Как можно купаться трезвым!? Не доволен
+                      rating:
+                        type: number
+                        example: 1
+                      tour:
+                        type: string
+                        example: 5c88fa8cf4afda39709c2955
+                      user:
+                        type: object
+                        properties:
+                          _id: 
+                            type: string
+                            example: 61cb77e8567dc378ee45db4b
+                          name:
+                            type: string
+                            example: Vladislav Zelenskiy
+                          photo:
+                            type: string
+                            example: user-11.jpg
+                      createdAt:
+                        type: string
+                        example: 2022-01-03T12:10:34.273Z
+                      id: 
+                        type: string
+                        example: 61d2e7ba84c8757c2abbdcfd
+                durationWeeks:
+                  type: number
+                  example: 1
+                id:
+                  type: string
+                  example: 5c88fa8cf4afda39709c2955
+    
+    getTourWithin_responses_400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: error
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пожалуйста приведите формат широты и долготы в формат "lat, lng"
+          
+    createOneTourForm:
+      type: object
+      properties:
+        startLocation:
+          type: object
+          properties:
+            type:
+              type: string
+              example: Point
+            coordinates:
+                type: number
+                example: 
+                  - -122.29286 
+                  - 38.294065
+            address: 
+              type: string
+              example: 560 Jefferson St, Napa, CA 94559, USA
+            description:
+              type: string
+              example: Калифорния, США
+        _id:
+          type: string
+          example: 61ef23ea06fef028bfa6a073
+        name: 
+          type: string
+          example: Морские исследования
+        duration:
+          type: number
+          example: 7
+        maxGroupSize:
+          type: number
+          example: 15
+        difficulty:
+          type: string
+          example: Средняя
+        ratingsAverage:
+          type: number
+          example: 5
+        ratingsQuantity:
+          type: number
+          format: float
+          example: 3.7
+        price: 
+          type: number
+          example: 497
+        summary: 
+          type: string
+          example: Изучайте потрясающее восточнее побережье США пешком и на лодке.
+        description: 
+          type: string
+          example: Первоначально называвшийся Royal Palm Park, Bayfront Park был первым общественным местом для встреч общины Большого Майами. Парк был построен в 1896 году, и в нем не было ничего, кроме павильона и зеленой зоны, которую посетители использовали для игр в бейсбол и легкой атлетики. /n Позднее была добавлена бандана, и парк часто использовался для проведения спортивных соревнований, культурных и религиозных мероприятий, политических мероприятий и многого другого. После многократного расширения за годы, парк Bayfront теперь занимает 32 акра в самом центре Майами и находится прямо на берегу залива Бискейн. Этот культовый парк идеально подходит для семей, которые хотят расслабиться, поиграть или потренироваться. /n В этом легендарном парке есть открытые лужайки, широкая набережная, извилистые дорожки, песчаный пляж, потрясающий фонтан, площадки для выступлений со специальным освещением и зоны отдыха для VIP-гостей, тропическая скала сад, водопад 1926 года и многое другое.
+        imageCover: 
+          type: string
+          example: tour-2-cover.jpg
+        images:
+          type: string
+          example:
+            - tour-2-1.jpg
+            - tour-2-2.jpg
+            - tour-2-3.jpg
+        startDates:
+          type: string
+          example:
+            - "2021-06-19T09:00:00.000Z"
+            - "2021-07-20T09:00:00.000Z"
+            - "2021-08-18T09:00:00.000Z"
+        secretTour:
+          type: boolean
+          example: true
+        locations:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: Point
+              coordinates:
+                  type: number
+                  example: 
+                    - -122.29286 
+                    - 38.294065
+              description: 
+                type: string
+                example: Луммус пляж
+              day:
+                type: number
+                example: 1
+        guides:
+          type: string
+          example:
+            - "61be0bd9ed34990ce476d9c0"
+            - "61be0ba5ed34990ce476d9be"
+
+    createOneTour_responses_200:
+      type: object
+      properties:
+        status: 
+          type: string
+          example: success
+        data: 
+          type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/createOneTourForm'
+        
+
+    createOneTour_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    createOneTour_responses_500:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        errror:
+          type: object
+          properties:
+            index:
+              type: number
+              example: 0
+            code:
+              type: number
+              example: 11000
+            keyPattern:
+              type: object
+              properties:
+                name:
+                  type: number
+                  example: 1
+            keyValue:
+              type: object
+              properties:
+                name: 
+                  type: string
+                  example: Северное сияние 
+            statusCode:
+              type: number
+              example: 500
+            status:
+              type: string
+              example: error
+        message: 
+          type: string
+          example: E11000 duplicate key error collection notours.tours index name_1 dup key { name \"Северное сияние\" }
+          
+    deleteOneTour_responses__400:
       type: object
       properties:
         status:
