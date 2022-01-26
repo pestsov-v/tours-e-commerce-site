@@ -1,0 +1,139 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /bookings/{id}:
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление брони по его ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      tags:
+        - bookings
+      responses:
+        204:
+          description: Удаление брони по его ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneBooking_responses_204'
+
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneBooking_responses_401'
+                
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneBooking_responses_403'
+        
+        404:
+          description: Нет бронирования с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneBooking_responses__404'
+                      
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    deleteOneBooking_responses_204:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          data:
+            type: number
+            example: null
+                        
+    deleteOneBooking_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+          
+    deleteOneBooking_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+          
+    deleteOneBooking_responses__404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: error
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
+          
+    
+    
+    

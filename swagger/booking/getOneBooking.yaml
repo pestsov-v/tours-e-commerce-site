@@ -1,0 +1,198 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /bookings/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение бронирования по его ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      tags:
+        - bookings
+      responses:
+        200:
+          description: Получение бронирования по его ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneBooking_responses_200'
+
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneBooking_responses_401'
+                
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneBooking_responses_403'
+        
+        404:
+          description: Нет бронирования с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneBooking_responses__404'
+                      
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    getOneBooking_responses_200:
+        type: object
+        properties:
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              _id:
+                type: string
+                example: 61d2e93ce107e4436db7e519
+              tour:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 5c88fa8cf4afda39709c295a
+                  name:
+                    type: string
+                    example: Снежные приключения
+                  guides:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61cb794a567dc378ee45db57
+                        name:
+                          type: string
+                          example: Александр Кириченко
+                        email:
+                          type: string
+                          example: alexander.kirichenko@gmail.com
+                        role:
+                          type: string
+                          example: lead-guide
+                        photo:
+                          type: string
+                          example: user-19.jpg
+                  durationWeeks:
+                    type: number
+                    example: null
+                  id:
+                    type: string
+                    example: 5c88fa8cf4afda39709c295a
+              user:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 61d719712770a1c3cc041ca0
+                  name:
+                    type: string
+                    example: Владислав Песцов
+                  email:
+                    type: string
+                    example: vladislav.user@gmail.com
+                  photo:
+                    type: string
+                    example: user-61d719712770a1c3cc041ca0-1641489813859.jpeg
+                  role:
+                    type: string
+                    example: user
+              price:
+                type: number
+                example: 997
+              paid: 
+                type: boolean
+                example: true
+                        
+    getOneBooking_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+          
+    getOneBooking_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+          
+    getOneBooking_responses__404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: error
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
+          
