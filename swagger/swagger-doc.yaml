@@ -54,7 +54,7 @@ paths:
 
   /users/login:
     post:
-      summary: Логирование пользователя на сайте
+      summary: Вход пользователя в свою учётную запись
       tags:
         - authentification
       requestBody:
@@ -65,7 +65,7 @@ paths:
         required: true
       responses:
         200:
-          description: Пользователь успешно вошел на сайт
+          description: Пользователь успешно вошел в свой аккаунт
           content:
             application/json:
               schema:
@@ -102,7 +102,7 @@ paths:
         - authentification
       responses:
         200:
-          description: Пользователь cоздан
+          description: Пользователь успешно вышел со своего аккаунта
           content:
             application/json:
               schema:
@@ -124,7 +124,7 @@ paths:
         required: true
       responses:
         200:
-          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          description: Письмо с токеном восстановления пароля успешно отправлено на почту
           content:
             application/json:
               schema:
@@ -161,7 +161,7 @@ paths:
               $ref: '#/components/schemas/resetPasswordForm'
       responses:
         200:
-          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          description: Письмо с токеном восстановления пароля успешно отправлено на почту
           content:
             application/json:
               schema:
@@ -193,7 +193,7 @@ paths:
               $ref: '#/components/schemas/updateMyPasswordForm'
       responses:
         200:
-          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          description: Пароль успешно изменён на новый
           content:
             application/json:
               schema:
@@ -233,7 +233,7 @@ paths:
                   $ref: '#/components/schemas/deleteMe_responses__401'
                       
           403:
-            description: Ошибка возникает если пользователь не обладает достаточными правами для совершения подобных действий
+            description: Ошибка возникает если пользователь не обладает достаточными правами для совершения подобных действий. Данные действия может совершать только пользователи с ролью "admin"
             content:
               application/json:
                 schema: 
@@ -853,11 +853,10 @@ paths:
                 $ref: '#/components/schemas/createOneTour_responses_500'
   
   /reviews/{id}:
-  
     patch:
       summary: Восстановления пароля по токену восстановления пароля
       tags:
-        - authentification
+        - reviews
       parameters:
           - in: path
             name: id
