@@ -12,8 +12,8 @@ const globalErrorHandler = require('./controllers/errorController');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
-const openapiSpecification = YAML.load('./swagger/allDocumentation.yaml');
-  
+const openapiSpecification = YAML.load('./swagger/swagger-doc.yaml');
+
 const tourRoutes = require('./routes/tourRoutes');
 const userRoutes = require('./routes/userRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');

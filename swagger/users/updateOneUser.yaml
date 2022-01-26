@@ -1,0 +1,247 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /users/{id}}:
+      patch:
+        security:
+          - bearerAuth: []
+        summary: Редактирование данных пользователя
+        parameters:
+          - in: path
+            name: id
+            schema:
+              type: string
+            required: true
+            description: ID пользователя, который будет обновлён
+        tags:
+          - users
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: Cергей Петрович
+                  email:
+                    type: string
+                    example: vladislav.pestsov@gmail.com
+                  role:
+                    type: string
+                    example: admin
+              
+        responses:
+          200:
+            description: Профиль пользователя успешно обновлён
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/updateOneUser_responses_200'
+          401:
+            description: Токен, который принадлежит пользователю, больше не сущесвует
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/updateOneUser_responses__401'
+          
+          403:
+            description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/updateOneUser_responses_403'
+        
+          404:
+            description: Нет комментария с данным ID
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/updateOneUser_responses__404'
+          
+          500: 
+            description: Ошибка возникает если введён не правильный формат ID тура
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/updateOneUser_responses_500'            
+
+
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    
+    updateOneUserFormApplicationJson:
+      type: object
+      properties:
+        name: 
+          type: string
+          example: Cергей Петрович
+        email: 
+          type: string
+          example: vladislav.pestsov@gmail.com
+        role: 
+          type: string
+          example: admin
+          
+    
+    updateOneUser_responses_200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            user: 
+              type: object
+              properties:
+                _id:
+                  type: string
+                  example: 61cb77d7567dc378ee45db49
+                name:
+                  type: string
+                  example: Cергей Петрович
+                email:
+                  type: string
+                  example: vladislav.pestsov@gmail.com
+                role:
+                  type: string
+                  example: admin
+                photo:
+                  type: string
+                  example: user-61cb77d7567dc378ee45db49-1641489907686.jpeg
+                passwordChangedAt:
+                  type: string
+                  format: date
+                  example: "2022-01-24T10:11:49.508Z"
+                passwordResetExpires:
+                  type: string
+                  format: date
+                  example: "2022-01-24T22:20:51.997Z"
+                passwordResetToken:
+                  type: string
+                  example: d917a4d6c1ad1aa71ef407bb026b7d14e10219d505840048187121d078ce0041
+                
+        
+
+
+    updateOneUser_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    updateOneUser_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+    
+              
+    updateOneUser_responses__404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
+    
+    updateOneUser_responses_500:
+      type: object
+      properties:
+        status: 
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            stringValue: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            valueType:
+              type: string
+              example: string
+            kind: 
+              type: string
+              example: objectId
+            value: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            path: 
+              type: string
+              example: tour
+            reason: 
+              type: string
+              example: {}
+            name: 
+              type: string
+              example: CastError
+            message: 
+              type: string
+              example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "_id" for model "User"
+        message:
+          type: string
+          example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "_id" for model "User"
+
+          
+    

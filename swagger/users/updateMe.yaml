@@ -1,0 +1,146 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /users/updateMe:
+      patch:
+        security:
+          - bearerAuth: []
+        summary: Редактирование данных пользователя
+        tags:
+          - authentification
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateMeFormApplicationJson'
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/updateMeFormMultipartFormData'
+              
+        responses:
+          200:
+            description: Аккаунт пользователя успешно деактивирован
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/updateMe_responses_200'
+          401:
+            description: Токен, который принадлежит пользователю, больше не сущесвует
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/updateMe_responses__401'
+                      
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    
+    updateMeFormApplicationJson:
+      type: object
+      properties:
+        name: 
+          type: string
+          example: Cергей Петрович
+        email: 
+          type: string
+          example: vladislav.pestsov@gmail.com
+        role: 
+          type: string
+          example: admin
+          
+    updateMeFormMultipartFormData:
+      type: object
+      properties:
+        photo:
+          type: string
+          format: binary
+          example: user-photo.19png
+        
+        name: 
+          type: string
+          example: Cергей Петрович
+        email: 
+          type: string
+          example: vladislav.pestsov@gmail.com
+        role: 
+          type: string
+          example: admin
+    
+    updateMe_responses_200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            user: 
+              type: object
+              properties:
+                _id:
+                  type: string
+                  example: 61cb77d7567dc378ee45db49
+                name:
+                  type: string
+                  example: Cергей Петрович
+                email:
+                  type: string
+                  example: vladislav.pestsov@gmail.com
+                role:
+                  type: string
+                  example: admin
+                photo:
+                  type: string
+                  example: user-61cb77d7567dc378ee45db49-1641489907686.jpeg
+                passwordChangedAt:
+                  type: string
+                  format: date
+                  example: "2022-01-24T10:11:49.508Z"
+                passwordResetExpires:
+                  type: string
+                  format: date
+                  example: "2022-01-24T22:20:51.997Z"
+                passwordResetToken:
+                  type: string
+                  example: d917a4d6c1ad1aa71ef407bb026b7d14e10219d505840048187121d078ce0041
+                
+    updateMe_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+
+      
+
+          
+    

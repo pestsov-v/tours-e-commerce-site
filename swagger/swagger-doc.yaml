@@ -1,0 +1,3827 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000/api/v1
+
+paths:
+  /users/signup:
+    post:
+      summary: Регистрация нового пользователя
+      tags:
+        - authentification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/signupForm'
+        required: true
+      responses:
+        201:
+          description: Пользователь cоздан
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZWQ0NDJkNTM4ZjliYTJiMDA2ZGVmNiIsImlhdCI6MTY0MjkzOTQ0MCwiZXhwIjoxNjUwNzE1NDQwfQ.WIIJipOGDO2omBcHmCjfj2LQpSr5ZubD6-2ecKOzzLU'
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/signup_responses__200'
+        400:
+          description: Необходимо заполнить все поля формы
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/signup_responses__400'
+                
+        409:
+          description: Пользователь с таким email уже существует
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/signup_responses__409'
+
+  /users/login:
+    post:
+      summary: Логирование пользователя на сайте
+      tags:
+        - authentification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/loginForm'
+        required: true
+      responses:
+        200:
+          description: Пользователь успешно вошел на сайт
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZWQ0NDJkNTM4ZjliYTJiMDA2ZGVmNiIsImlhdCI6MTY0MjkzOTQ0MCwiZXhwIjoxNjUwNzE1NDQwfQ.WIIJipOGDO2omBcHmCjfj2LQpSr5ZubD6-2ecKOzzLU'
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/login_responses__200'
+        400:
+          description: Необходимо заполнить все поля формы
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/login_responses__400'
+                    
+        401:
+          description: Неверный логин или пароль вводимый пользователем
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/login_responses__401'
+           
+  /users/logout:
+    get:
+      summary: Выход пользователя со своей учётной записи
+      tags:
+        - authentification
+      responses:
+        200:
+          description: Пользователь cоздан
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'    
+                    
+  /users/forgotPassword:
+    post:
+      summary: Отправка на почту токен восстановления пароля
+      tags:
+        - authentification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/forgotPasswordForm'
+        required: true
+      responses:
+        200:
+          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  message:
+                    type: string
+                    example: Токен отправлен на почту
+        404:
+          description: Пользователя с данным Email не существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forgotPassword_responses__404'
+                
+  /users/resetPassword/{token}:
+    patch:
+      summary: Восстановления пароля по токену восстановления пароля
+      tags:
+        - authentification
+      parameters:
+          - in: path
+            name: token
+            schema:
+              type: string
+            required: true
+            description: Токен восстановления пароля
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/resetPasswordForm'
+      responses:
+        200:
+          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  message:
+                    type: string
+                    example: Токен отправлен на почту
+        400:
+          description: Пользователя с данным Email не существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resetPassword_responses__400'
+  
+  /users/updateMyPasssword:
+    patch:
+      summary: Изменение действующего пароля пользователя на другой
+      security:
+        - bearerAuth: []
+      tags:
+        - authentification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateMyPasswordForm'
+      responses:
+        200:
+          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/updateMyPassword_responses__200'
+        401:
+          description: Пользователя с данным Email не существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateMyPassword_responses__401'
+                
+  /users/deleteMe:
+      delete:
+        security:
+          - bearerAuth: []
+        summary: Деактивация пользователя
+        tags:
+          - authentification
+        responses:
+          204:
+            description: Аккаунт пользователя успешно деактивирован
+            content:
+              application/json:
+                schema:
+                  properties:
+                    status:
+                      type: string
+                      example: 'success'
+                    data:
+                      type: string
+                      example: null
+          401:
+            description: Токен, который принадлежит пользователю, больше не сущесвует
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/deleteMe_responses__401'
+                      
+          403:
+            description: Ошибка возникает если пользователь не обладает достаточными правами для совершения подобных действий
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/deleteMe_responses__403'
+  
+  /users:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение массива всех пользователей
+      tags:
+        - users
+      responses:
+        200:
+          description: Получение массива всех пользователей
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/users_responses_200'
+  
+  /users/me:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение профиля пользователя
+      tags:
+        - users
+      responses:
+        200:
+          description: Получение данных профиля пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/me_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/me_responses_401'
+                
+  /users/updateMe:
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Редактирование данных пользователя
+      tags:
+        - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateMeFormApplicationJson'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/updateMeFormMultipartFormData'
+            
+      responses:
+        200:
+          description: Аккаунт пользователя успешно деактивирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateMe_responses_200'
+        401:
+          description: Токен, который принадлежит пользователю, больше не сущесвует
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/updateMe_responses__401'
+                
+  /users/{id}:
+    patch:
+        security:
+          - bearerAuth: []
+        summary: Редактирование данных пользователя
+        parameters:
+          - in: path
+            name: id
+            schema:
+              type: string
+            required: true
+            description: ID пользователя, который будет обновлён
+        tags:
+          - users
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateOneUserFormApplicationJson'
+              
+        responses:
+          200:
+            description: Профиль пользователя успешно обновлён
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/updateOneUser_responses_200'
+          401:
+            description: Токен, который принадлежит пользователю, больше не сущесвует
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/updateOneUser_responses__401'
+          
+          403:
+            description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/updateOneUser_responses_403'
+        
+          404:
+            description: Нет комментария с данным ID
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/updateOneUser_responses__404'
+          
+          500: 
+            description: Ошибка возникает если введён не правильный формат ID тура
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/updateOneUser_responses_500'
+  
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление пользователя
+      tags:
+          - users
+      parameters:
+          - in: path
+            name: id
+            schema:
+              type: string
+            required: true
+            description: ID пользователя, который будет удалён
+      responses:
+        204:
+          description: Пользователь успешно удалён
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  data:
+                    type: string
+                    example: null
+        404:
+          description: Нет пользователя с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteUser_responses__404'
+  /tours:
+    get:
+      parameters:
+        - in: query
+          name: duration
+          example: duration[gte]=5
+          schema:
+            type: integer
+          description: Больше или равно указаного количества дней которые занимает тур. Доступны следующие фильтры - 
+            1. [gte] - больше или равно указаного количества. 
+            2. [gt]- больше указаного количества. 
+            3. [lte] - меньше или равно указаного количества.
+            4. [lt]- меньше указаного количества людей.
+        - in: query
+          name: sort
+          example: sort=maxGroupSize  
+          schema:
+            type: string
+          description: Сортирует массив туров в зависимости от параметра сортировки. По умолчанию сортировка от меньшей стоимости к большей, чтобы инверсировать сортировку необходимо ввести вместо "sort=maxGroupSize" - "sort=maxGroupSize-1". Доступны следующие параметры сортировки - 
+            1. price - сортировка по цене. 
+            2. duration - сортировка по количеству дней продолжительности тура. 
+            3. maxGroupSize - сортировка по количеству людей в одной групе.
+            4. difficulty - сложность тура.
+            5. ratingsQuantity - рейтинг тура
+        - in: query
+          name: limit
+          example: limit=8
+          schema:
+            type: number
+          description: Пагинация необходимого количество туров.  
+      security:
+        - bearerAuth: []
+      summary: Получение массива всех туров
+      tags:
+        - tours
+      responses:
+        200:
+          description: Получение массива всех туров
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllTours_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllTours_responses_401'
+  
+    post:
+      security:
+        - bearerAuth: []
+      summary: Получение определённого тура по его ID
+      tags:
+        - tours
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createOneTourForm'
+        required: true
+      responses:
+        200:
+          description: Получение данных определенного тура по его ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneTour_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneTour_responses_401'
+        
+        500:
+          description: Ошибка появляется если тур с данным именем уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneTour_responses_500'
+                
+  /tours/{id}:
+    get:
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID определённого тура
+      security:
+        - bearerAuth: []
+      summary: Получение определённого тура по его ID
+      tags:
+        - tours
+      responses:
+        200:
+          description: Получение данных определенного тура по его ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneTour_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneTour_responses_401'
+    
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Редактирование одного тура по его ID
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: ID определённого тура
+      tags:
+        - tours
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/updateOneTourMultipartFormData'
+            
+      responses:
+        200:
+          description: Аккаунт пользователя успешно деактивирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateOneTour_responses_200'
+        
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateOneTour_responses__401'
+        
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateOneTour_responses_403'
+      
+        404:
+          description: Нет комментария с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateOneTour_responses__404'
+        
+        500: 
+          description: Ошибка возникает если введён не правильный формат ID тура
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateOneTour_responses_500'
+                
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление одного тура
+      tags:
+          - tours
+      parameters:
+          - in: path
+            name: id
+            schema:
+              type: string
+            required: true
+            description: ID тура, который будет удалён
+      responses:
+        204:
+          description: Тур успешно удалён
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  data:
+                    type: string
+                    example: null
+        404:
+          description: Нет пользователя с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneTour_responses__400'
+
+  /tours/distances/{latlng}/unit/{unit}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение расстояния ко всем турам относительно точки указаной на карте 
+      tags:
+          - tours
+      parameters:
+          - in: path
+            name: latlng
+            schema:
+              type: string
+            required: true
+            description: Долгота и широта определённой точки на карте. Первым параметром указывается широта, вторым - долгота
+            example: distances/34.058, -118.256
+          - in: path
+            name: unit
+            schema:
+              type: string
+            required: true
+            description: Единица измерения расстояния радиуса диапазона относительно определённой точки. Доступны 2 вида исчисления. Если радиус указывается в милях, необходимо указать "mi". Если радиус указывается в километрах, необходимо указать "km"
+            example: distances/34.058, -118.256/unit/mi
+            
+      responses:
+        204:
+          description: Результат расстояния от точки к каждому существующему туру
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  results:
+                    type: number
+                    example: 1
+                  data:
+                    $ref: '#/components/schemas/getDistances_responses__200'
+        
+        400:
+          description: ss
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getDistances_responses_400'
+  
+  
+  /tours/tours-within/{distances}/center/{latlng}/unit/{unit}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение всех туров в желаемом диапазоне расстояния относительно определённой точки на карте 
+      tags:
+          - tours
+      parameters:
+          - in: path
+            name: distances
+            schema:
+              type: number
+            required: true
+            description: Размер радиуса диапазона относительно определённой точки на карте
+            example: tours-within/115
+          - in: path
+            name: latlng
+            schema:
+              type: string
+            required: true
+            description: Долгота и широта определённой точки на карте. Первым параметром указывается широта, вторым - долгота
+            example: tours-within/115/center/34.058, -118.256
+          - in: path
+            name: unit
+            schema:
+              type: string
+            required: true
+            description: Единица измерения расстояния радиуса диапазона относительно определённой точки. Доступны 2 вида исчисления. Если радиус указывается в милях, необходимо указать "mi". Если радиус указывается в километрах, необходимо указать "km"
+            example: tours-within/115/center/34.058, -118.256/unit/mi
+            
+      
+      responses:
+        204:
+          description: Результат всех найденых в радиусе туров
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  results:
+                    type: number
+                    example: 1
+                  data:
+                    $ref: '#/components/schemas/getTourWithin_responses__200'
+        
+        400:
+          description: Не приведёт формат широты и долготы в формат "lat, lng"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getTourWithin_responses_400'
+                
+  /tours/monthly-plan/{year}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение расписания по действующим турам в указанный год
+      parameters:
+        - in: path
+          name: year
+          schema:
+            type: string
+          required: true
+          description: Год за который нужно расписание по проходящим турам
+      tags:
+        - tours
+      responses:
+        200:
+          description: Получение cтатистики по каждой сложности тура
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getToursMonthlyPlan_responses_200'
+              
+
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getToursMonthlyPlan_responses_401'
+                
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getToursMonthlyPlan_responses_403'
+                
+  /tours/stats:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение статистики по каждой сложности тура, в которою входят количество туров, средний рейтинг, средняя цена тура, минимальная цена тура и максимальная цена тура
+      tags:
+        - tours
+      responses:
+        200:
+          description: Получение cтатистики по каждой сложности тура
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getTourStats_responses_200'
+              
+
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getTourStats_responses_401'
+                
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getTourStats_responses_403'
+
+  /reviews:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение массива всех комментариев
+      tags:
+        - reviews
+      responses:
+        200:
+          description: Получение массива всех комментариев
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllReviews_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllReviews_responses_401'
+                
+  /tours/{id}/reviews:
+    get:
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      summary: Получение массива всех комментариев к одному туру
+      tags:
+        - reviews
+      responses:
+        200:
+          description: Получение массива всех комментариев к одному туру
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneReviewOnTour_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneReviewOnTour_responses_401'
+                        
+        500: 
+          description: Ошибка возникает если введён не правильный формат ID тура
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneReviewOnTour_responses_500'
+    
+    post:
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      summary: Создание одного комментария
+      tags:
+        - reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createOneReviewForm'
+        required: true
+      responses:
+        201:
+          description: Создание одного комментария
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneReviewOnTour_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneTour_responses_401'
+        
+        500:
+          description: Ошибка появляется если тур с данным именем уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneTour_responses_500'
+  
+  /reviews/{id}:
+  
+    patch:
+      summary: Восстановления пароля по токену восстановления пароля
+      tags:
+        - authentification
+      parameters:
+          - in: path
+            name: id
+            schema:
+              type: string
+            required: true
+            description: Токен восстановления пароля
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/editReviewForm'
+      responses:
+        200:
+          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editReview_responses__200'
+                
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editReview_responses_401'
+          
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editReview_responses_403'
+        
+        404:
+          description: Нет комментария с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editReview_responses__404'
+        
+        500: 
+          description: Ошибка возникает если введён не правильный формат ID тура
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/editReview_responses_500'
+  
+    delete:
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      summary: Удаление одного коментария по его ID
+      tags:
+        - reviews
+      responses:
+        204:
+          description: Комментарий успешно удалён
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  data:
+                    type: string
+                    example: null
+        404:
+          description: Нет пользователя с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneReviewOnTour_responses__400'
+                
+  /bookings:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение массива всех бронирований
+      tags:
+        - bookings
+      responses:
+        200:
+          description: Получение массива всех бронировий
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllBookings_responses_200'
+
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllBookings_responses_401'
+                
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllBookings_responses_403'
+                
+  /bookings/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение бронирования по его ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      tags:
+        - bookings
+      responses:
+        200:
+          description: Получение бронирования по его ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneBooking_responses_200'
+
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneBooking_responses_401'
+                
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneBooking_responses_403'
+        
+        404:
+          description: Нет бронирования с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getOneBooking_responses__404'
+                
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удаление брони по его ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      tags:
+        - bookings
+      responses:
+        204:
+          description: Удаление брони по его ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneBooking_responses_204'
+
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneBooking_responses_401'
+                
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneBooking_responses_403'
+        
+        404:
+          description: Нет бронирования с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneBooking_responses__404'
+                    
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+  
+    signupForm:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Vladislav Pestsov
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+        password:
+          type: string
+          example: 12345678
+        passwordConfirm:
+          type: string
+          example: 12345678
+      required: 
+        - name
+        - example
+        - password
+        - passwordConfirm
+    
+    signup_responses__200:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Vladislav Pestsov
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+        photo:
+          type: string
+          example: default.jpg
+        role:
+          type: string
+          example: user
+        active:
+          type: boolean
+          example: true
+        _id:
+          type: string
+          example: 61ed442d538f9ba2b006def6
+          
+    signup_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пожалуйста заполните все поля
+        
+    signup_responses__409:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 409
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пользователь с данным Email уже существует
+  
+    
+    loginForm:
+      type: object
+      properties:
+        email: 
+          type: string
+          example: vladislav.pestsov@gmail.com
+        password:
+          type: string
+          example: 12345678
+          
+    login_responses__200:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 61ed442d538f9ba2b006def6
+        name:
+          type: string
+          example: Vladislav Pestsov
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+        role:
+          type: string
+          example: user
+        photo:
+          type: string
+          example: default.jpg
+        passwordChangedAt:
+          type: string
+          example: "2022-01-08T12:32:51.572Z"
+          
+    login_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пожалуйста заполните все поля
+          
+    login_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Неверный логин или пароль
+          
+    forgotPasswordForm:
+      type: object
+      properties:
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+    
+    forgotPassword_responses__404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Не существует пользователя с данным Email адресом
+          
+    resetPasswordForm:
+      type: object
+      properties:
+        password:
+          type: string
+          example: password123
+        passwordConfirm:
+          type: string
+          example: password123
+    
+    resetPassword_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Неверный токен или его срок годности истёк
+          
+    updateMyPasswordForm:
+      type: object
+      properties:
+        passwordCurrent:
+          type: string
+          example: 12345678
+        password:
+          type: string
+          example: password123
+        passwordConfirm:
+          type: string
+          example: password123
+    
+    
+    updateMyPassword_responses__200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        token: 
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxY2I3N2Q3NTY3ZGMzNzhlZTQ1ZGI0OSIsImlhdCI6MTY0MzAxOTExMCwiZXhwIjoxNjUwNzk1MTEwfQ.MweQr8JkzmLJW7TUHGcE6-xmFSJFotbSgexUhRb8yQ0
+        data: 
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/updateMyPassword_userForm_responses__200'
+    
+    updateMyPassword_userForm_responses__200:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 61cb77d7567dc378ee45db49
+        name:
+          type: string
+          example: Vladislav Pestsov
+        email:
+          type: string
+          example: vladislav.pestsov@gmail.com
+        role: 
+          type: string
+          example: user
+        photo:
+          type: string
+          example: user-61cb77d7567dc378ee45db49-1641489907686.jpeg
+        passwordChangedAt:
+          type: string
+          example: 2022-01-24T10:11:49.508Z
+        passwordResetExpires:
+          type: string
+          example: 2022-01-24T10:04:24.573Z
+        passwordResetToken:
+          type: string
+          example: 8759a136a875295aeafe65fc56a404d68d327761d1d70e38e7982bfc90ce0ca0
+    
+    
+    updateMyPassword_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Ваш текущий пароль не верный
+          
+    deleteMe_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Токен, который Вам принадлежит, больше не существует.
+      
+    deleteMe_responses__403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не обладаете достаточными права для сорвершения подобных действий.      
+          
+    users_responses_200:
+      type: array
+      items:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              data: 
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 61cb77aa567dc378ee45db47
+                    name:
+                      type: string
+                      example: Vladislav Pestsov
+                    email:
+                      type: string
+                      example: vladislav.pestsov@gmail.com
+                    role:
+                      type: string
+                      example: user
+                    photo:
+                      type: string
+                      example: user-5.jpg
+    
+    updateMeFormApplicationJson:
+      type: object
+      properties:
+        name: 
+          type: string
+          example: Cергей Петрович
+        email: 
+          type: string
+          example: vladislav.pestsov@gmail.com
+        role: 
+          type: string
+          example: admin
+          
+    updateMeFormMultipartFormData:
+      type: object
+      properties:
+        photo:
+          type: string
+          format: binary
+          example: user-photo.19png
+        
+        name: 
+          type: string
+          example: Cергей Петрович
+        email: 
+          type: string
+          example: vladislav.pestsov@gmail.com
+        role: 
+          type: string
+          example: admin
+    
+    updateMe_responses_200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            user: 
+              type: object
+              properties:
+                _id:
+                  type: string
+                  example: 61cb77d7567dc378ee45db49
+                name:
+                  type: string
+                  example: Cергей Петрович
+                email:
+                  type: string
+                  example: vladislav.pestsov@gmail.com
+                role:
+                  type: string
+                  example: admin
+                photo:
+                  type: string
+                  example: user-61cb77d7567dc378ee45db49-1641489907686.jpeg
+                passwordChangedAt:
+                  type: string
+                  format: date
+                  example: "2022-01-24T10:11:49.508Z"
+                passwordResetExpires:
+                  type: string
+                  format: date
+                  example: "2022-01-24T22:20:51.997Z"
+                passwordResetToken:
+                  type: string
+                  example: d917a4d6c1ad1aa71ef407bb026b7d14e10219d505840048187121d078ce0041
+    
+    updateMe_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+          
+    updateOneUserFormApplicationJson:
+      type: object
+      properties:
+        name: 
+          type: string
+          example: Cергей Петрович
+        email: 
+          type: string
+          example: vladislav.pestsov@gmail.com
+        role: 
+          type: string
+          example: admin
+          
+    
+    updateOneUser_responses_200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            user: 
+              type: object
+              properties:
+                _id:
+                  type: string
+                  example: 61cb77d7567dc378ee45db49
+                name:
+                  type: string
+                  example: Cергей Петрович
+                email:
+                  type: string
+                  example: vladislav.pestsov@gmail.com
+                role:
+                  type: string
+                  example: admin
+                photo:
+                  type: string
+                  example: user-61cb77d7567dc378ee45db49-1641489907686.jpeg
+                passwordChangedAt:
+                  type: string
+                  format: date
+                  example: "2022-01-24T10:11:49.508Z"
+                passwordResetExpires:
+                  type: string
+                  format: date
+                  example: "2022-01-24T22:20:51.997Z"
+                passwordResetToken:
+                  type: string
+                  example: d917a4d6c1ad1aa71ef407bb026b7d14e10219d505840048187121d078ce0041
+                
+    updateOneUser_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    updateOneUser_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+    
+              
+    updateOneUser_responses__404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
+    
+    updateOneUser_responses_500:
+      type: object
+      properties:
+        status: 
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            stringValue: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            valueType:
+              type: string
+              example: string
+            kind: 
+              type: string
+              example: objectId
+            value: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            path: 
+              type: string
+              example: tour
+            reason: 
+              type: string
+              example: {}
+            name: 
+              type: string
+              example: CastError
+            message: 
+              type: string
+              example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "_id" for model "User"
+        message:
+          type: string
+          example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "_id" for model "User"
+    
+    me_responses_200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            data: 
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 61cb77aa567dc378ee45db47
+                  name:
+                    type: string
+                    example: Vladislav Pestsov
+                  email:
+                    type: string
+                    example: vladislav.pestsov@gmail.com
+                  role:
+                    type: string
+                    example: user
+                  photo:
+                    type: string
+                    example: user-61cb77d7567dc378ee45db49-1641489907686.jpeg
+                  passwordChangedAt:
+                    type: string
+                    example: '2022-01-24T10:11:49.508Z'
+                  passwordResetExpires:
+                    type: string
+                    example: '2022-01-24T10:04:24.573Z'
+                  passwordResetToken:
+                    type: string
+                    example: 8759a136a875295aeafe65fc56a404d68d327761d1d70e38e7982bfc90ce0ca0
+                  
+    me_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    updateOneTourMultipartFormData:
+      type: object
+      properties:
+        imageCover:
+          type: string
+          format: binary
+          example: user-photo.19png
+        images:
+          type: array
+          items:
+            type: string
+            format: binary
+            example: user-photo.19png
+        name: 
+          type: string
+          example: Морские исследования
+        duration:
+          type: number
+          example: 7
+        maxGroupSize:
+          type: number
+          example: 15
+        difficulty:
+          type: string
+          example: Средняя
+        ratingsAverage:
+          type: number
+          example: 5
+        ratingsQuantity:
+          type: number
+          format: float
+          example: 3.7
+        price: 
+          type: number
+          example: 497
+        summary: 
+          type: string
+          example: Изучайте потрясающее восточнее побережье США пешком и на лодке.
+        description: 
+          type: string
+          example: Первоначально называвшийся Royal Palm Park, Bayfront Park был первым общественным местом для встреч общины Большого Майами. Парк был построен в 1896 году, и в нем не было ничего, кроме павильона и зеленой зоны, которую посетители использовали для игр в бейсбол и легкой атлетики. /n Позднее была добавлена бандана, и парк часто использовался для проведения спортивных соревнований, культурных и религиозных мероприятий, политических мероприятий и многого другого. После многократного расширения за годы, парк Bayfront теперь занимает 32 акра в самом центре Майами и находится прямо на берегу залива Бискейн. Этот культовый парк идеально подходит для семей, которые хотят расслабиться, поиграть или потренироваться. /n В этом легендарном парке есть открытые лужайки, широкая набережная, извилистые дорожки, песчаный пляж, потрясающий фонтан, площадки для выступлений со специальным освещением и зоны отдыха для VIP-гостей, тропическая скала сад, водопад 1926 года и многое другое.
+        startDates:
+          type: string
+          example:
+            - "2021-06-19T09:00:00.000Z"
+            - "2021-07-20T09:00:00.000Z"
+            - "2021-08-18T09:00:00.000Z"
+        secretTour:
+          type: boolean
+          example: false
+        locations:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: Point
+              coordinates:
+                  type: number
+                  example: 
+                    - -122.29286 
+                    - 38.294065
+              description: 
+                type: string
+                example: Луммус пляж
+              day:
+                type: number
+                example: 1
+              _id: 
+                type: string
+                example: 5c88fa8cf4afda39709c2959
+        guides:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+                example: 61cb7930567dc378ee45db55
+              name:
+                  type: string
+                  example: Наталья Величко
+              email: 
+                type: string
+                example: natalia.veluchko@gmail.com
+              role:
+                type: string
+                example: lead-guide
+              photo: 
+                type: string
+                example: user-8.jpg
+        slug:
+          type: string
+          example: morskie-issledovaniya
+        reviews: 
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+                example: 61d2e7ba84c8757c2abbdcfd
+              review:
+                type: string
+                example: Гид запрещал пить водочку. Как можно купаться трезвым!? Не доволен
+              rating:
+                type: number
+                example: 1
+              tour:
+                type: string
+                example: 5c88fa8cf4afda39709c2955
+              user:
+                type: object
+                properties:
+                  _id: 
+                    type: string
+                    example: 61cb77e8567dc378ee45db4b
+                  name:
+                    type: string
+                    example: Vladislav Zelenskiy
+                  photo:
+                    type: string
+                    example: user-11.jpg
+              createdAt:
+                type: string
+                example: 2022-01-03T12:10:34.273Z
+              id: 
+                type: string
+                example: 61d2e7ba84c8757c2abbdcfd
+        durationWeeks:
+          type: number
+          example: 1
+        id:
+          type: string
+          example: 5c88fa8cf4afda39709c2955
+    
+    updateOneTour_responses_200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            data: 
+              type: object
+              properties:
+                startLocation:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      example: Point
+                    coordinates:
+                        type: number
+                        example: 
+                          - -122.29286 
+                          - 38.294065
+                    address: 
+                      type: string
+                      example: 560 Jefferson St, Napa, CA 94559, USA
+                    description:
+                      type: string
+                      example: Калифорния, США
+                _id:
+                  type: string
+                  example: 61ef23ea06fef028bfa6a073
+                name: 
+                  type: string
+                  example: Морские исследования
+                duration:
+                  type: number
+                  example: 7
+                maxGroupSize:
+                  type: number
+                  example: 15
+                difficulty:
+                  type: string
+                  example: Средняя
+                ratingsAverage:
+                  type: number
+                  example: 5
+                ratingsQuantity:
+                  type: number
+                  format: float
+                  example: 3.7
+                price: 
+                  type: number
+                  example: 497
+                summary: 
+                  type: string
+                  example: Изучайте потрясающее восточнее побережье США пешком и на лодке.
+                description: 
+                  type: string
+                  example: Первоначально называвшийся Royal Palm Park, Bayfront Park был первым общественным местом для встреч общины Большого Майами. Парк был построен в 1896 году, и в нем не было ничего, кроме павильона и зеленой зоны, которую посетители использовали для игр в бейсбол и легкой атлетики. /n Позднее была добавлена бандана, и парк часто использовался для проведения спортивных соревнований, культурных и религиозных мероприятий, политических мероприятий и многого другого. После многократного расширения за годы, парк Bayfront теперь занимает 32 акра в самом центре Майами и находится прямо на берегу залива Бискейн. Этот культовый парк идеально подходит для семей, которые хотят расслабиться, поиграть или потренироваться. /n В этом легендарном парке есть открытые лужайки, широкая набережная, извилистые дорожки, песчаный пляж, потрясающий фонтан, площадки для выступлений со специальным освещением и зоны отдыха для VIP-гостей, тропическая скала сад, водопад 1926 года и многое другое.
+                imageCover: 
+                  type: string
+                  example: tour-2-cover.jpg
+                images:
+                  type: string
+                  example:
+                    - tour-2-1.jpg
+                    - tour-2-2.jpg
+                    - tour-2-3.jpg
+                startDates:
+                  type: string
+                  example:
+                    - "2021-06-19T09:00:00.000Z"
+                    - "2021-07-20T09:00:00.000Z"
+                    - "2021-08-18T09:00:00.000Z"
+                secretTour:
+                  type: boolean
+                  example: false
+                locations:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: Point
+                      coordinates:
+                          type: number
+                          example: 
+                            - -122.29286 
+                            - 38.294065
+                      description: 
+                        type: string
+                        example: Луммус пляж
+                      day:
+                        type: number
+                        example: 1
+                      _id: 
+                        type: string
+                        example: 5c88fa8cf4afda39709c2959
+                guides:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 61cb7930567dc378ee45db55
+                      name:
+                          type: string
+                          example: Наталья Величко
+                      email: 
+                        type: string
+                        example: natalia.veluchko@gmail.com
+                      role:
+                        type: string
+                        example: lead-guide
+                      photo: 
+                        type: string
+                        example: user-8.jpg
+                slug:
+                  type: string
+                  example: morskie-issledovaniya
+                reviews: 
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 61d2e7ba84c8757c2abbdcfd
+                      review:
+                        type: string
+                        example: Гид запрещал пить водочку. Как можно купаться трезвым!? Не доволен
+                      rating:
+                        type: number
+                        example: 1
+                      tour:
+                        type: string
+                        example: 5c88fa8cf4afda39709c2955
+                      user:
+                        type: object
+                        properties:
+                          _id: 
+                            type: string
+                            example: 61cb77e8567dc378ee45db4b
+                          name:
+                            type: string
+                            example: Vladislav Zelenskiy
+                          photo:
+                            type: string
+                            example: user-11.jpg
+                      createdAt:
+                        type: string
+                        example: 2022-01-03T12:10:34.273Z
+                      id: 
+                        type: string
+                        example: 61d2e7ba84c8757c2abbdcfd
+                durationWeeks:
+                  type: number
+                  example: 1
+                id:
+                  type: string
+                  example: 5c88fa8cf4afda39709c2955
+                
+    updateOneTour_responses__401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    updateOneTour_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+    
+              
+    updateOneTour_responses__404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
+    
+    updateOneTour_responses_500:
+      type: object
+      properties:
+        status: 
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            stringValue: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            valueType:
+              type: string
+              example: string
+            kind: 
+              type: string
+              example: objectId
+            value: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            path: 
+              type: string
+              example: tour
+            reason: 
+              type: string
+              example: {}
+            name: 
+              type: string
+              example: CastError
+            message: 
+              type: string
+              example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "_id" for model "Tour"
+        message:
+          type: string
+          example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "_id" for model "Tour"
+    
+    deleteUser_responses__404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
+          
+    getAllTours_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              data: 
+                type: array
+                items:
+                    type: object
+                    properties:
+                      startLocation:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            example: Point
+                          coordinates:
+                              type: number
+                              example: 
+                                - -122.29286 
+                                - 38.294065
+                          address: 
+                            type: string
+                            example: 560 Jefferson St, Napa, CA 94559, USA
+                          description:
+                            type: string
+                            example: Калифорния, США
+                      _id:
+                        type: string
+                        example: 61ef23ea06fef028bfa6a073
+                      name: 
+                        type: string
+                        example: Морские исследования
+                      duration:
+                        type: number
+                        example: 7
+                      maxGroupSize:
+                        type: number
+                        example: 15
+                      difficulty:
+                        type: string
+                        example: Средняя
+                      ratingsAverage:
+                        type: number
+                        example: 5
+                      ratingsQuantity:
+                        type: number
+                        format: float
+                        example: 3.7
+                      price: 
+                        type: number
+                        example: 497
+                      summary: 
+                        type: string
+                        example: Изучайте потрясающее восточнее побережье США пешком и на лодке.
+                      description: 
+                        type: string
+                        example: Первоначально называвшийся Royal Palm Park, Bayfront Park был первым общественным местом для встреч общины Большого Майами. Парк был построен в 1896 году, и в нем не было ничего, кроме павильона и зеленой зоны, которую посетители использовали для игр в бейсбол и легкой атлетики. /n Позднее была добавлена бандана, и парк часто использовался для проведения спортивных соревнований, культурных и религиозных мероприятий, политических мероприятий и многого другого. После многократного расширения за годы, парк Bayfront теперь занимает 32 акра в самом центре Майами и находится прямо на берегу залива Бискейн. Этот культовый парк идеально подходит для семей, которые хотят расслабиться, поиграть или потренироваться. /n В этом легендарном парке есть открытые лужайки, широкая набережная, извилистые дорожки, песчаный пляж, потрясающий фонтан, площадки для выступлений со специальным освещением и зоны отдыха для VIP-гостей, тропическая скала сад, водопад 1926 года и многое другое.
+                      imageCover: 
+                        type: string
+                        example: tour-2-cover.jpg
+                      images:
+                        type: string
+                        example:
+                          - tour-2-1.jpg
+                          - tour-2-2.jpg
+                          - tour-2-3.jpg
+                      startDates:
+                        type: string
+                        example:
+                          - "2021-06-19T09:00:00.000Z"
+                          - "2021-07-20T09:00:00.000Z"
+                          - "2021-08-18T09:00:00.000Z"
+                      secretTour:
+                        type: boolean
+                        example: false
+                      locations:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              example: Point
+                            coordinates:
+                                type: number
+                                example: 
+                                  - -122.29286 
+                                  - 38.294065
+                            description: 
+                              type: string
+                              example: Луммус пляж
+                            day:
+                              type: number
+                              example: 1
+                            _id: 
+                              type: string
+                              example: 5c88fa8cf4afda39709c2959
+                      guides:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
+                              example: 61cb7930567dc378ee45db55
+                            name:
+                                type: string
+                                example: Наталья Величко
+                            email: 
+                              type: string
+                              example: natalia.veluchko@gmail.com
+                            role:
+                              type: string
+                              example: lead-guide
+                            photo: 
+                              type: string
+                              example: user-8.jpg
+                      slug:
+                        type: string
+                        example: morskie-issledovaniya
+                      reviews: 
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
+                              example: 61d2e7ba84c8757c2abbdcfd
+                            review:
+                              type: string
+                              example: Гид запрещал пить водочку. Как можно купаться трезвым!? Не доволен
+                            rating:
+                              type: number
+                              example: 1
+                            tour:
+                              type: string
+                              example: 5c88fa8cf4afda39709c2955
+                            user:
+                              type: object
+                              properties:
+                                _id: 
+                                  type: string
+                                  example: 61cb77e8567dc378ee45db4b
+                                name:
+                                  type: string
+                                  example: Vladislav Zelenskiy
+                                photo:
+                                  type: string
+                                  example: user-11.jpg
+                            createdAt:
+                              type: string
+                              example: 2022-01-03T12:10:34.273Z
+                            id: 
+                              type: string
+                              example: 61d2e7ba84c8757c2abbdcfd
+                      durationWeeks:
+                        type: number
+                        example: 1
+                      id:
+                        type: string
+                        example: 5c88fa8cf4afda39709c2955
+                      
+                      
+    getAllTours_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+          
+    getOneTour_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          data:
+            type: object
+            properties:
+              data: 
+                type: object
+                properties:
+                  startLocation:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: Point
+                      coordinates:
+                          type: number
+                          example: 
+                            - -122.29286 
+                            - 38.294065
+                      address: 
+                        type: string
+                        example: 560 Jefferson St, Napa, CA 94559, USA
+                      description:
+                        type: string
+                        example: Калифорния, США
+                  _id:
+                    type: string
+                    example: 61ef23ea06fef028bfa6a073
+                  name: 
+                    type: string
+                    example: Морские исследования
+                  duration:
+                    type: number
+                    example: 7
+                  maxGroupSize:
+                    type: number
+                    example: 15
+                  difficulty:
+                    type: string
+                    example: Средняя
+                  ratingsAverage:
+                    type: number
+                    example: 5
+                  ratingsQuantity:
+                    type: number
+                    format: float
+                    example: 3.7
+                  price: 
+                    type: number
+                    example: 497
+                  summary: 
+                    type: string
+                    example: Изучайте потрясающее восточнее побережье США пешком и на лодке.
+                  description: 
+                    type: string
+                    example: Первоначально называвшийся Royal Palm Park, Bayfront Park был первым общественным местом для встреч общины Большого Майами. Парк был построен в 1896 году, и в нем не было ничего, кроме павильона и зеленой зоны, которую посетители использовали для игр в бейсбол и легкой атлетики. /n Позднее была добавлена бандана, и парк часто использовался для проведения спортивных соревнований, культурных и религиозных мероприятий, политических мероприятий и многого другого. После многократного расширения за годы, парк Bayfront теперь занимает 32 акра в самом центре Майами и находится прямо на берегу залива Бискейн. Этот культовый парк идеально подходит для семей, которые хотят расслабиться, поиграть или потренироваться. /n В этом легендарном парке есть открытые лужайки, широкая набережная, извилистые дорожки, песчаный пляж, потрясающий фонтан, площадки для выступлений со специальным освещением и зоны отдыха для VIP-гостей, тропическая скала сад, водопад 1926 года и многое другое.
+                  imageCover: 
+                    type: string
+                    example: tour-2-cover.jpg
+                  images:
+                    type: string
+                    example:
+                      - tour-2-1.jpg
+                      - tour-2-2.jpg
+                      - tour-2-3.jpg
+                  startDates:
+                    type: string
+                    example:
+                      - "2021-06-19T09:00:00.000Z"
+                      - "2021-07-20T09:00:00.000Z"
+                      - "2021-08-18T09:00:00.000Z"
+                  secretTour:
+                    type: boolean
+                    example: false
+                  locations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: Point
+                        coordinates:
+                            type: number
+                            example: 
+                              - -122.29286 
+                              - 38.294065
+                        description: 
+                          type: string
+                          example: Луммус пляж
+                        day:
+                          type: number
+                          example: 1
+                        _id: 
+                          type: string
+                          example: 5c88fa8cf4afda39709c2959
+                  guides:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61cb7930567dc378ee45db55
+                        name:
+                            type: string
+                            example: Наталья Величко
+                        email: 
+                          type: string
+                          example: natalia.veluchko@gmail.com
+                        role:
+                          type: string
+                          example: lead-guide
+                        photo: 
+                          type: string
+                          example: user-8.jpg
+                  slug:
+                    type: string
+                    example: morskie-issledovaniya
+                  reviews: 
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61d2e7ba84c8757c2abbdcfd
+                        review:
+                          type: string
+                          example: Гид запрещал пить водочку. Как можно купаться трезвым!? Не доволен
+                        rating:
+                          type: number
+                          example: 1
+                        tour:
+                          type: string
+                          example: 5c88fa8cf4afda39709c2955
+                        user:
+                          type: object
+                          properties:
+                            _id: 
+                              type: string
+                              example: 61cb77e8567dc378ee45db4b
+                            name:
+                              type: string
+                              example: Vladislav Zelenskiy
+                            photo:
+                              type: string
+                              example: user-11.jpg
+                        createdAt:
+                          type: string
+                          example: 2022-01-03T12:10:34.273Z
+                        id: 
+                          type: string
+                          example: 61d2e7ba84c8757c2abbdcfd
+                  durationWeeks:
+                    type: number
+                    example: 1
+                  id:
+                    type: string
+                    example: 5c88fa8cf4afda39709c2955
+                      
+                      
+    getOneTour_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную 
+          
+    getDistances_responses__200:
+        type: object
+        properties:
+          data: 
+            type: array
+            items:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 5c88fa8cf4afda39709c2966
+                  name:
+                    type: string
+                    example: Северное сияние
+                  distance:
+                    type: number
+                    format: float
+                    example: 31.587032474139185
+                      
+    getDistances_responses_400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: error
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пожалуйста приведите формат широты и долготы в формат "lat, lng"
+    
+    getTourWithin_responses__200:
+      type: object
+      properties:
+        data: 
+          type: array
+          items:
+              type: object
+              properties:
+                startLocation:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      example: Point
+                    coordinates:
+                        type: number
+                        example: 
+                          - -122.29286 
+                          - 38.294065
+                    address: 
+                      type: string
+                      example: 560 Jefferson St, Napa, CA 94559, USA
+                    description:
+                      type: string
+                      example: Калифорния, США
+                _id:
+                  type: string
+                  example: 61ef23ea06fef028bfa6a073
+                name: 
+                  type: string
+                  example: Морские исследования
+                duration:
+                  type: number
+                  example: 7
+                maxGroupSize:
+                  type: number
+                  example: 15
+                difficulty:
+                  type: string
+                  example: Средняя
+                ratingsAverage:
+                  type: number
+                  example: 5
+                ratingsQuantity:
+                  type: number
+                  format: float
+                  example: 3.7
+                price: 
+                  type: number
+                  example: 497
+                summary: 
+                  type: string
+                  example: Изучайте потрясающее восточнее побережье США пешком и на лодке.
+                description: 
+                  type: string
+                  example: Первоначально называвшийся Royal Palm Park, Bayfront Park был первым общественным местом для встреч общины Большого Майами. Парк был построен в 1896 году, и в нем не было ничего, кроме павильона и зеленой зоны, которую посетители использовали для игр в бейсбол и легкой атлетики. /n Позднее была добавлена бандана, и парк часто использовался для проведения спортивных соревнований, культурных и религиозных мероприятий, политических мероприятий и многого другого. После многократного расширения за годы, парк Bayfront теперь занимает 32 акра в самом центре Майами и находится прямо на берегу залива Бискейн. Этот культовый парк идеально подходит для семей, которые хотят расслабиться, поиграть или потренироваться. /n В этом легендарном парке есть открытые лужайки, широкая набережная, извилистые дорожки, песчаный пляж, потрясающий фонтан, площадки для выступлений со специальным освещением и зоны отдыха для VIP-гостей, тропическая скала сад, водопад 1926 года и многое другое.
+                imageCover: 
+                  type: string
+                  example: tour-2-cover.jpg
+                images:
+                  type: string
+                  example:
+                    - tour-2-1.jpg
+                    - tour-2-2.jpg
+                    - tour-2-3.jpg
+                startDates:
+                  type: string
+                  example:
+                    - "2021-06-19T09:00:00.000Z"
+                    - "2021-07-20T09:00:00.000Z"
+                    - "2021-08-18T09:00:00.000Z"
+                secretTour:
+                  type: boolean
+                  example: false
+                locations:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: Point
+                      coordinates:
+                          type: number
+                          example: 
+                            - -122.29286 
+                            - 38.294065
+                      description: 
+                        type: string
+                        example: Луммус пляж
+                      day:
+                        type: number
+                        example: 1
+                      _id: 
+                        type: string
+                        example: 5c88fa8cf4afda39709c2959
+                guides:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 61cb7930567dc378ee45db55
+                      name:
+                          type: string
+                          example: Наталья Величко
+                      email: 
+                        type: string
+                        example: natalia.veluchko@gmail.com
+                      role:
+                        type: string
+                        example: lead-guide
+                      photo: 
+                        type: string
+                        example: user-8.jpg
+                slug:
+                  type: string
+                  example: morskie-issledovaniya
+                reviews: 
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 61d2e7ba84c8757c2abbdcfd
+                      review:
+                        type: string
+                        example: Гид запрещал пить водочку. Как можно купаться трезвым!? Не доволен
+                      rating:
+                        type: number
+                        example: 1
+                      tour:
+                        type: string
+                        example: 5c88fa8cf4afda39709c2955
+                      user:
+                        type: object
+                        properties:
+                          _id: 
+                            type: string
+                            example: 61cb77e8567dc378ee45db4b
+                          name:
+                            type: string
+                            example: Vladislav Zelenskiy
+                          photo:
+                            type: string
+                            example: user-11.jpg
+                      createdAt:
+                        type: string
+                        example: 2022-01-03T12:10:34.273Z
+                      id: 
+                        type: string
+                        example: 61d2e7ba84c8757c2abbdcfd
+                durationWeeks:
+                  type: number
+                  example: 1
+                id:
+                  type: string
+                  example: 5c88fa8cf4afda39709c2955
+    
+    getTourWithin_responses_400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: error
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пожалуйста приведите формат широты и долготы в формат "lat, lng"
+          
+    createOneTourForm:
+      type: object
+      properties:
+        startLocation:
+          type: object
+          properties:
+            type:
+              type: string
+              example: Point
+            coordinates:
+                type: number
+                example: 
+                  - -122.29286 
+                  - 38.294065
+            address: 
+              type: string
+              example: 560 Jefferson St, Napa, CA 94559, USA
+            description:
+              type: string
+              example: Калифорния, США
+        _id:
+          type: string
+          example: 61ef23ea06fef028bfa6a073
+        name: 
+          type: string
+          example: Морские исследования
+        duration:
+          type: number
+          example: 7
+        maxGroupSize:
+          type: number
+          example: 15
+        difficulty:
+          type: string
+          example: Средняя
+        ratingsAverage:
+          type: number
+          example: 5
+        ratingsQuantity:
+          type: number
+          format: float
+          example: 3.7
+        price: 
+          type: number
+          example: 497
+        summary: 
+          type: string
+          example: Изучайте потрясающее восточнее побережье США пешком и на лодке.
+        description: 
+          type: string
+          example: Первоначально называвшийся Royal Palm Park, Bayfront Park был первым общественным местом для встреч общины Большого Майами. Парк был построен в 1896 году, и в нем не было ничего, кроме павильона и зеленой зоны, которую посетители использовали для игр в бейсбол и легкой атлетики. /n Позднее была добавлена бандана, и парк часто использовался для проведения спортивных соревнований, культурных и религиозных мероприятий, политических мероприятий и многого другого. После многократного расширения за годы, парк Bayfront теперь занимает 32 акра в самом центре Майами и находится прямо на берегу залива Бискейн. Этот культовый парк идеально подходит для семей, которые хотят расслабиться, поиграть или потренироваться. /n В этом легендарном парке есть открытые лужайки, широкая набережная, извилистые дорожки, песчаный пляж, потрясающий фонтан, площадки для выступлений со специальным освещением и зоны отдыха для VIP-гостей, тропическая скала сад, водопад 1926 года и многое другое.
+        imageCover: 
+          type: string
+          example: tour-2-cover.jpg
+        images:
+          type: string
+          example:
+            - tour-2-1.jpg
+            - tour-2-2.jpg
+            - tour-2-3.jpg
+        startDates:
+          type: string
+          example:
+            - "2021-06-19T09:00:00.000Z"
+            - "2021-07-20T09:00:00.000Z"
+            - "2021-08-18T09:00:00.000Z"
+        secretTour:
+          type: boolean
+          example: true
+        locations:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: Point
+              coordinates:
+                  type: number
+                  example: 
+                    - -122.29286 
+                    - 38.294065
+              description: 
+                type: string
+                example: Луммус пляж
+              day:
+                type: number
+                example: 1
+        guides:
+          type: string
+          example:
+            - "61be0bd9ed34990ce476d9c0"
+            - "61be0ba5ed34990ce476d9be"
+
+    createOneTour_responses_200:
+      type: object
+      properties:
+        status: 
+          type: string
+          example: success
+        data: 
+          type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/createOneTourForm'
+        
+
+    createOneTour_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    createOneTour_responses_500:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        errror:
+          type: object
+          properties:
+            index:
+              type: number
+              example: 0
+            code:
+              type: number
+              example: 11000
+            keyPattern:
+              type: object
+              properties:
+                name:
+                  type: number
+                  example: 1
+            keyValue:
+              type: object
+              properties:
+                name: 
+                  type: string
+                  example: Северное сияние 
+            statusCode:
+              type: number
+              example: 500
+            status:
+              type: string
+              example: error
+        message: 
+          type: string
+          example: E11000 duplicate key error collection notours.tours index name_1 dup key { name \"Северное сияние\" }
+          
+    deleteOneTour_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
+          
+    getToursMonthlyPlan_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          data:
+            type: object
+            properties:
+              plan: 
+                items:
+                  type: object
+                  properties:
+                    numTourStarts:
+                      type: number
+                      example: 1
+                    tours:
+                      type: array
+                      items:
+                        type: string
+                        example: Снежные приключения
+                    month:
+                      type: number
+                      example: 1
+                        
+    getToursMonthlyPlan_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+          
+    getToursMonthlyPlan_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+    
+    getTourStats_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          data:
+            type: object
+            properties:
+              data: 
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: Лёгкая
+                    numTours:
+                      type: number
+                      example: 2
+                    numRatings:
+                      type: number
+                      example: 6.5
+                    avgRating:
+                      type: number
+                      example: 5
+                    avgPrice:
+                      type: number
+                      example: 797
+                    minPrice:
+                      type: number
+                      example: 397
+                    maxPrice:
+                      type: number
+                      example: 1197
+                        
+    getTourStats_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+          
+    getTourStats_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+    
+    
+          
+    getAllReviews_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              data: 
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 61d2e93ce107e4436db7e519
+                    review:
+                      type: string
+                      example: Серфинг включим в следующую программу
+                    rating:
+                      type: number
+                      example: 3
+                    tour:
+                      type: string
+                      example: 5c88fa8cf4afda39709c2955
+                    user:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61cb790e567dc378ee45db53
+                        name:
+                          type: string
+                          example: Виктор Левко
+                        photo:
+                          type: string
+                          example: user-9.jpg
+                    createdAt:
+                      type: string
+                      format: date
+                      example: "2022-01-03T12:17:00.411Z"
+                    id:   
+                      type: string
+                      example: 61d2e93ce107e4436db7e519
+
+    getAllReviews_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    createOneReviewOnTour_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              data: 
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 61d2e93ce107e4436db7e519
+                    review:
+                      type: string
+                      example: Серфинг включим в следующую программу
+                    rating:
+                      type: number
+                      example: 3
+                    tour:
+                      type: string
+                      example: 5c88fa8cf4afda39709c2955
+                    user:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61cb790e567dc378ee45db53
+                        name:
+                          type: string
+                          example: Виктор Левко
+                        photo:
+                          type: string
+                          example: user-9.jpg
+                    createdAt:
+                      type: string
+                      format: date
+                      example: "2022-01-03T12:17:00.411Z"
+                    id:   
+                      type: string
+                      example: 61d2e93ce107e4436db7e519
+
+    createOneReviewOnTour_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    createOneReviewOnTour_responses_500:
+      type: object
+      properties:
+        status: 
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            stringValue: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            valueType:
+              type: string
+              example: string
+            kind: 
+              type: string
+              example: objectId
+            value: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            path: 
+              type: string
+              example: tour
+            reason: 
+              type: string
+              example: {}
+            name: 
+              type: string
+              example: CastError
+            message: 
+              type: string
+              example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "tour" for model "Review"
+        message:
+          type: string
+          example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "tour" for model "Review"
+    
+    createOneReviewForm:
+        type: object
+        properties:
+          rating:
+            type: number
+            example: 5
+          review:
+            type: string
+            example: Лучшее путешествие, которое было в моей жизни
+  
+    deleteOneReviewOnTour_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
+          
+    editReviewForm:
+      type: object
+      properties:
+        rating:
+          type: number
+          example: 4
+        review:
+          type: string
+          example: Слишком большая группа, с меньшим количеством участников было бы проще
+    
+    editReview_responses__200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data: 
+          type: object
+          properties:
+            data:
+              type: object
+              properties:
+                _id:
+                  type: string
+                  example: 61d2e978e107e4436db7e55c
+                review:
+                  type: string
+                  example: Слишком большая группа, с меньшим количеством участников было бы прощ
+                rating:
+                  type: string
+                  example: 4
+                tour:
+                  type: string
+                  example: 5c88fa8cf4afda39709c296c
+                user:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 61cb790e567dc378ee45db53
+                    name:
+                      type: string
+                      example: Виктор Левко
+                    photo:
+                      type: string
+                      example: user-9.jpg
+                createdAt:
+                  type: string
+                  format: date
+                  example: "2022-01-03T12:18:00.227Z"
+                id:
+                  type: string
+                  example: 61d2e978e107e4436db7e55c
+                  
+    editReview_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    editReview_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+    
+              
+    editReview_responses__404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
+          
+    editReview_responses_500:
+      type: object
+      properties:
+        status: 
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            stringValue: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            valueType:
+              type: string
+              example: string
+            kind: 
+              type: string
+              example: objectId
+            value: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            path: 
+              type: string
+              example: tour
+            reason: 
+              type: string
+              example: {}
+            name: 
+              type: string
+              example: CastError
+            message: 
+              type: string
+              example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "tour" for model "Review"
+        message:
+          type: string
+          example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "tour" for model "Review"
+          
+          
+    getAllBookings_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              data: 
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 61d2e93ce107e4436db7e519
+                    tour:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 5c88fa8cf4afda39709c295a
+                        name:
+                          type: string
+                          example: Снежные приключения
+                        guides:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              _id:
+                                type: string
+                                example: 61cb794a567dc378ee45db57
+                              name:
+                                type: string
+                                example: Александр Кириченко
+                              email:
+                                type: string
+                                example: alexander.kirichenko@gmail.com
+                              role:
+                                type: string
+                                example: lead-guide
+                              photo:
+                                type: string
+                                example: user-19.jpg
+                        durationWeeks:
+                          type: number
+                          example: null
+                        id:
+                          type: string
+                          example: 5c88fa8cf4afda39709c295a
+                    user:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61d719712770a1c3cc041ca0
+                        name:
+                          type: string
+                          example: Владислав Песцов
+                        email:
+                          type: string
+                          example: vladislav.user@gmail.com
+                        photo:
+                          type: string
+                          example: user-61d719712770a1c3cc041ca0-1641489813859.jpeg
+                        role:
+                          type: string
+                          example: user
+                    price:
+                      type: number
+                      example: 997
+                    paid: 
+                      type: boolean
+                      example: true
+                        
+    getAllBookings_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+          
+    getAllBookings_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+          
+    getOneBooking_responses_200:
+        type: object
+        properties:
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              _id:
+                type: string
+                example: 61d2e93ce107e4436db7e519
+              tour:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 5c88fa8cf4afda39709c295a
+                  name:
+                    type: string
+                    example: Снежные приключения
+                  guides:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61cb794a567dc378ee45db57
+                        name:
+                          type: string
+                          example: Александр Кириченко
+                        email:
+                          type: string
+                          example: alexander.kirichenko@gmail.com
+                        role:
+                          type: string
+                          example: lead-guide
+                        photo:
+                          type: string
+                          example: user-19.jpg
+                  durationWeeks:
+                    type: number
+                    example: null
+                  id:
+                    type: string
+                    example: 5c88fa8cf4afda39709c295a
+              user:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 61d719712770a1c3cc041ca0
+                  name:
+                    type: string
+                    example: Владислав Песцов
+                  email:
+                    type: string
+                    example: vladislav.user@gmail.com
+                  photo:
+                    type: string
+                    example: user-61d719712770a1c3cc041ca0-1641489813859.jpeg
+                  role:
+                    type: string
+                    example: user
+              price:
+                type: number
+                example: 997
+              paid: 
+                type: boolean
+                example: true
+                        
+    getOneBooking_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+          
+    getOneBooking_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+          
+    getOneBooking_responses__404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: error
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
+          
+    deleteOneBooking_responses_204:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          data:
+            type: number
+            example: null
+                        
+    deleteOneBooking_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+          
+    deleteOneBooking_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+          
+    deleteOneBooking_responses__404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: error
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
