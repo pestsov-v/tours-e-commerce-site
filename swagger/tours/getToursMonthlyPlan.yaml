@@ -1,0 +1,127 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /tours/monthly-plan/{year}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение расписания по действующим турам в указанный год
+      parameters:
+        - in: path
+          name: year
+          schema:
+            type: string
+          required: true
+          description: Год за который нужно расписание по проходящим турам
+      tags:
+        - tours
+      responses:
+        200:
+          description: Получение cтатистики по каждой сложности тура
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getToursMonthlyPlan_responses_200'
+              
+
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getToursMonthlyPlan_responses_401'
+                
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getToursMonthlyPlan_responses_403'
+
+                  
+                      
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    getToursMonthlyPlan_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          data:
+            type: object
+            properties:
+              plan: 
+                items:
+                  type: object
+                  properties:
+                    numTourStarts:
+                      type: number
+                      example: 1
+                    tours:
+                      type: array
+                      items:
+                        type: string
+                        example: Снежные приключения
+                    month:
+                      type: number
+                      example: 1
+                        
+    getToursMonthlyPlan_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+          
+    getToursMonthlyPlan_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+    
+    

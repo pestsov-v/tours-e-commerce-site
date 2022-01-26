@@ -1,0 +1,130 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /tours/stats:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение статистики по каждой сложности тура, в которою входят количество туров, средний рейтинг, средняя цена тура, минимальная цена тура и максимальная цена тура
+      tags:
+        - tours
+      responses:
+        200:
+          description: Получение cтатистики по каждой сложности тура
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getTourStats_responses_200'
+              
+
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getTourStats_responses_401'
+                
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getTourStats_responses_403'
+
+                  
+                      
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    getTourStats_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          data:
+            type: object
+            properties:
+              data: 
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: Лёгкая
+                    numTours:
+                      type: number
+                      example: 2
+                    numRatings:
+                      type: number
+                      example: 6.5
+                    avgRating:
+                      type: number
+                      example: 5
+                    avgPrice:
+                      type: number
+                      example: 797
+                    minPrice:
+                      type: number
+                      example: 397
+                    maxPrice:
+                      type: number
+                      example: 1197
+                        
+    getTourStats_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+          
+    getTourStats_responses_403:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 403
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не владеете достаточными правами для совершения подобных действий
+    
+    
