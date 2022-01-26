@@ -1,0 +1,113 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /bookings:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение массива всех бронирований
+      tags:
+        - bookings
+      responses:
+        200:
+          description: Получение массива всех бронировий
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllBookings_responses_200'
+
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllBookings_responses_401'
+                      
+        
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    
+    getAllReviews_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              data: 
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 61d2e93ce107e4436db7e519
+                    review:
+                      type: string
+                      example: Серфинг включим в следующую программу
+                    rating:
+                      type: number
+                      example: 3
+                    tour:
+                      type: string
+                      example: 5c88fa8cf4afda39709c2955
+                    user:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61cb790e567dc378ee45db53
+                        name:
+                          type: string
+                          example: Виктор Левко
+                        photo:
+                          type: string
+                          example: user-9.jpg
+                    createdAt:
+                      type: string
+                      format: date
+                      example: "2022-01-03T12:17:00.411Z"
+                    id:   
+                      type: string
+                      example: 61d2e93ce107e4436db7e519
+
+    getAllBookings_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    
