@@ -1,0 +1,171 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /tours/{id}/reviews:
+    post:
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      summary: Создание одного комментария
+      tags:
+        - reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createOneReviewForm'
+        required: true
+      responses:
+        201:
+          description: Создание одного комментария
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneReviewOnTour_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneTour_responses_401'
+        
+        500:
+          description: Ошибка появляется если тур с данным именем уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneTour_responses_500'
+                        
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    createOneReviewForm:
+        type: object
+        properties:
+          rating:
+            type: number
+            example: 5
+          review:
+            type: string
+            example: Лучшее путешествие, которое было в моей жизни
+    
+    createOneReviewOnTour_responses_200:
+      type: object
+      properties:
+        status: 
+          type: string
+          example: success
+        data: 
+          type: object
+          properties:
+            data: 
+              type: object
+              properties:
+                review:
+                  type: string
+                  example: Лучшее путешествие, которое было в моей жизни
+                rating:
+                  type: number
+                  example: 5
+                tour:
+                  type: string
+                  example: 61ef23ea06fef028bfa6a073
+                user:
+                  type: string
+                  example: 61cb77d7567dc378ee45db49
+                _id:
+                  type: string
+                  example: 61f12e738b6af441bd629278
+                createdAt: 
+                  type: string
+                  format: date
+                  example: "2022-01-26T11:20:19.537Z"
+                id:
+                  type: string
+                  example: 61f12e738b6af441bd629278
+              
+        
+
+    createOneTour_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    createOneTour_responses_500:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        errror:
+          type: object
+          properties:
+            index:
+              type: number
+              example: 0
+            code:
+              type: number
+              example: 11000
+            keyPattern:
+              type: object
+              properties:
+                tour:
+                  type: number
+                  example: 1
+                user:
+                  type: number
+            keyValue:
+              type: object
+              properties:
+                tour: 
+                  type: string
+                  example: 61ef23ea06fef028bfa6a073
+                user:
+                  type: string
+                  example: 61cb77d7567dc378ee45db49
+            statusCode:
+              type: number
+              example: 500
+            status:
+              type: string
+              example: error
+        message: 
+          type: string
+          example: E11000 duplicate key error collection notours.reviews index tour_1_user_1 dup key { tour ObjectId('61ef23ea06fef028bfa6a073'), user ObjectId('61cb77d7567dc378ee45db49') }
+          
+    
+    

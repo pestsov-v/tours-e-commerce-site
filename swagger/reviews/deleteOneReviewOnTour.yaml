@@ -1,0 +1,73 @@
+openapi: 3.0.1
+info:
+  title: Natours
+  description: Сервис для покупки туров
+  contact:
+    email: vladislav.pestsov@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:4000/api/v1
+paths:
+  /reviews/{id}:
+    delete:
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      summary: Удаление одного коментария по его ID
+      tags:
+        - reviews
+      responses:
+        204:
+          description: Комментарий успешно удалён
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  data:
+                    type: string
+                    example: null
+        404:
+          description: Нет пользователя с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneReviewOnTour_responses__400'
+        
+                        
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    deleteOneReviewOnTour_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID

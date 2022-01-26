@@ -12,7 +12,7 @@ paths:
     post:
       security:
         - bearerAuth: []
-      summary: Получение определённого тура по его ID
+      summary: Cоздание одного тура
       tags:
         - tours
       requestBody:
@@ -214,7 +214,7 @@ components:
               example: error
         message: 
           type: string
-          example: E11000 duplicate key error collection notours.tours index name_1 dup key { name \"Северное сияние\" }
+          example: E11000 duplicate key error collection notours.tours index name_1 dup key { name "Северное сияние" }
           
     
     

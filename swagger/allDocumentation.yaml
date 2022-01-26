@@ -551,7 +551,132 @@ paths:
               schema:
                 $ref: '#/components/schemas/getTourWithin_responses_400'
   
+  /reviews:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получение массива всех комментариев
+      tags:
+        - reviews
+      responses:
+        200:
+          description: Получение массива всех комментариев
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllReviews_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllReviews_responses_401'
+                
+  /tours/{id}/reviews:
+    get:
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      summary: Получение массива всех комментариев к одному туру
+      tags:
+        - reviews
+      responses:
+        200:
+          description: Получение массива всех комментариев к одному туру
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneReviewOnTour_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneReviewOnTour_responses_401'
+                        
+        500: 
+          description: Ошибка возникает если введён не правильный формат ID тура
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneReviewOnTour_responses_500'
+    
+    post:
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      summary: Создание одного комментария
+      tags:
+        - reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createOneReviewForm'
+        required: true
+      responses:
+        201:
+          description: Создание одного комментария
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneReviewOnTour_responses_200'
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneTour_responses_401'
+        
+        500:
+          description: Ошибка появляется если тур с данным именем уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createOneTour_responses_500'
   
+  /reviews/{id}:
+    delete:
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      summary: Удаление одного коментария по его ID
+      tags:
+        - reviews
+      responses:
+        204:
+          description: Комментарий успешно удалён
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  data:
+                    type: string
+                    example: null
+        404:
+          description: Нет пользователя с данным ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteOneReviewOnTour_responses__400'
                     
 components:
   securitySchemes:
@@ -1798,6 +1923,215 @@ components:
           example: E11000 duplicate key error collection notours.tours index name_1 dup key { name \"Северное сияние\" }
           
     deleteOneTour_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Нет документa з данным ID
+          
+    getAllReviews_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              data: 
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 61d2e93ce107e4436db7e519
+                    review:
+                      type: string
+                      example: Серфинг включим в следующую программу
+                    rating:
+                      type: number
+                      example: 3
+                    tour:
+                      type: string
+                      example: 5c88fa8cf4afda39709c2955
+                    user:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61cb790e567dc378ee45db53
+                        name:
+                          type: string
+                          example: Виктор Левко
+                        photo:
+                          type: string
+                          example: user-9.jpg
+                    createdAt:
+                      type: string
+                      format: date
+                      example: "2022-01-03T12:17:00.411Z"
+                    id:   
+                      type: string
+                      example: 61d2e93ce107e4436db7e519
+
+    getAllReviews_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    createOneReviewOnTour_responses_200:
+        type: object
+        properties:
+          status:
+            type: string
+            example: success
+          results:
+            type: number
+            example: 1
+          data:
+            type: object
+            properties:
+              data: 
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 61d2e93ce107e4436db7e519
+                    review:
+                      type: string
+                      example: Серфинг включим в следующую программу
+                    rating:
+                      type: number
+                      example: 3
+                    tour:
+                      type: string
+                      example: 5c88fa8cf4afda39709c2955
+                    user:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 61cb790e567dc378ee45db53
+                        name:
+                          type: string
+                          example: Виктор Левко
+                        photo:
+                          type: string
+                          example: user-9.jpg
+                    createdAt:
+                      type: string
+                      format: date
+                      example: "2022-01-03T12:17:00.411Z"
+                    id:   
+                      type: string
+                      example: 61d2e93ce107e4436db7e519
+
+    createOneReviewOnTour_responses_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 401
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+    
+    createOneReviewOnTour_responses_500:
+      type: object
+      properties:
+        status: 
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            stringValue: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            valueType:
+              type: string
+              example: string
+            kind: 
+              type: string
+              example: objectId
+            value: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            path: 
+              type: string
+              example: tour
+            reason: 
+              type: string
+              example: {}
+            name: 
+              type: string
+              example: CastError
+            message: 
+              type: string
+              example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "tour" for model "Review"
+        message:
+          type: string
+          example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "tour" for model "Review"
+    
+    createOneReviewForm:
+        type: object
+        properties:
+          rating:
+            type: number
+            example: 5
+          review:
+            type: string
+            example: Лучшее путешествие, которое было в моей жизни
+  
+    deleteOneReviewOnTour_responses__400:
       type: object
       properties:
         status:
