@@ -43,7 +43,7 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/signup_responses__400'
+                $ref: '#/components/schemas/EmptyFields_responses__400'
                 
         409:
           description: Пользователь с таким email уже существует
@@ -54,7 +54,7 @@ paths:
 
   /users/login:
     post:
-      summary: Вход пользователя в свою учётную запись
+      summary: Логирование пользователя на сайте
       tags:
         - authentification
       requestBody:
@@ -65,7 +65,7 @@ paths:
         required: true
       responses:
         200:
-          description: Пользователь успешно вошел в свой аккаунт
+          description: Пользователь успешно вошел на сайт
           content:
             application/json:
               schema:
@@ -86,7 +86,7 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/login_responses__400'
+                $ref: '#/components/schemas/EmptyFields_responses__400'
                     
         401:
           description: Неверный логин или пароль вводимый пользователем
@@ -102,7 +102,7 @@ paths:
         - authentification
       responses:
         200:
-          description: Пользователь успешно вышел со своего аккаунта
+          description: Пользователь cоздан
           content:
             application/json:
               schema:
@@ -124,7 +124,7 @@ paths:
         required: true
       responses:
         200:
-          description: Письмо с токеном восстановления пароля успешно отправлено на почту
+          description: Письмо с токеном восстановления пароля успешно отправлен на почту
           content:
             application/json:
               schema:
@@ -140,7 +140,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/forgotPassword_responses__404'
+                $ref: '#/components/schemas/HaveNotUserWithThisEmail_responses__404'
                 
   /users/resetPassword/{token}:
     patch:
@@ -161,7 +161,7 @@ paths:
               $ref: '#/components/schemas/resetPasswordForm'
       responses:
         200:
-          description: Письмо с токеном восстановления пароля успешно отправлено на почту
+          description: Письмо с токеном восстановления пароля успешно отправлен на почту
           content:
             application/json:
               schema:
@@ -172,12 +172,12 @@ paths:
                   message:
                     type: string
                     example: Токен отправлен на почту
-        400:
+        404:
           description: Пользователя с данным Email не существует
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/resetPassword_responses__400'
+                $ref: '#/components/schemas/HaveNotUserWithThisEmail_responses__404'
   
   /users/updateMyPasssword:
     patch:
@@ -193,7 +193,7 @@ paths:
               $ref: '#/components/schemas/updateMyPasswordForm'
       responses:
         200:
-          description: Пароль успешно изменён на новый
+          description: Письмо с токеном восстановления пароля успешно отправлен на почту
           content:
             application/json:
               schema:
@@ -233,11 +233,11 @@ paths:
                   $ref: '#/components/schemas/deleteMe_responses__401'
                       
           403:
-            description: Ошибка возникает если пользователь не обладает достаточными правами для совершения подобных действий. Данные действия может совершать только пользователи с ролью "admin"
+            description: Ошибка возникает если пользователь не обладает достаточными правами для совершения подобных действий
             content:
               application/json:
                 schema: 
-                  $ref: '#/components/schemas/deleteMe_responses__403'
+                  $ref: '#/components/schemas/NotHaveRules_responses_403'
   
   /users:
     get:
@@ -253,6 +253,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/users_responses_200'
+                
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
+                
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotHaveRules_responses_403'
   
   /users/me:
     get:
@@ -273,7 +287,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/me_responses_401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
                 
   /users/updateMe:
     patch:
@@ -337,29 +351,29 @@ paths:
             content:
               application/json:
                 schema: 
-                  $ref: '#/components/schemas/updateOneUser_responses__401'
+                  $ref: '#/components/schemas/UserNotLogin_responses_401'
           
           403:
             description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/updateOneUser_responses_403'
+                  $ref: '#/components/schemas/NotHaveRules_responses_403'
         
           404:
             description: Нет комментария с данным ID
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/updateOneUser_responses__404'
+                  $ref: '#/components/schemas/NotFoundDocument_responses__404'
           
           500: 
-            description: Ошибка возникает если введён не правильный формат ID тура
+            description: Ошибка возникает если введён не правильный формат ID пользователя
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/updateOneUser_responses_500'
-  
+                  $ref: '#/components/schemas/InvalidObjectId_responses_500'
+                  
     delete:
       security:
         - bearerAuth: []
@@ -386,12 +400,29 @@ paths:
                   data:
                     type: string
                     example: null
+                    
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
+                
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotHaveRules_responses_403'
+
         404:
           description: Нет пользователя с данным ID
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/deleteUser_responses__404'
+                $ref: '#/components/schemas/NotFoundDocument_responses__404'
+        
+        
   /tours:
     get:
       parameters:
@@ -439,7 +470,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getAllTours_responses_401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
   
     post:
       security:
@@ -465,7 +496,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/createOneTour_responses_401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
         
         500:
           description: Ошибка появляется если тур с данным именем уже существует
@@ -500,7 +531,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getOneTour_responses_401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
     
     patch:
       security:
@@ -534,28 +565,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/updateOneTour_responses__401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
         
         403:
           description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/updateOneTour_responses_403'
+                $ref: '#/components/schemas/NotHaveRules_responses_403'
       
         404:
           description: Нет комментария с данным ID
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/updateOneTour_responses__404'
+                $ref: '#/components/schemas/NotFoundDocument_responses__404'
         
         500: 
           description: Ошибка возникает если введён не правильный формат ID тура
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/updateOneTour_responses_500'
+                $ref: '#/components/schemas/InvalidObjectId_responses_500'
                 
     delete:
       security:
@@ -588,7 +619,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/deleteOneTour_responses__400'
+                $ref: '#/components/schemas/NotFoundDocument_responses__404'
 
   /tours/distances/{latlng}/unit/{unit}:
     get:
@@ -614,7 +645,7 @@ paths:
             example: distances/34.058, -118.256/unit/mi
             
       responses:
-        204:
+        200:
           description: Результат расстояния от точки к каждому существующему туру
           content:
             application/json:
@@ -630,11 +661,18 @@ paths:
                     $ref: '#/components/schemas/getDistances_responses__200'
         
         400:
-          description: ss
+          description: Не приведён формат широты и долготы в формат "lat, lng"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/getDistances_responses_400'
+        
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
   
   
   /tours/tours-within/{distances}/center/{latlng}/unit/{unit}:
@@ -669,7 +707,7 @@ paths:
             
       
       responses:
-        204:
+        200:
           description: Результат всех найденых в радиусе туров
           content:
             application/json:
@@ -685,11 +723,18 @@ paths:
                     $ref: '#/components/schemas/getTourWithin_responses__200'
         
         400:
-          description: Не приведёт формат широты и долготы в формат "lat, lng"
+          description: Не приведён формат широты и долготы в формат "lat, lng"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/getTourWithin_responses_400'
+                
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
                 
   /tours/monthly-plan/{year}:
     get:
@@ -719,14 +764,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getToursMonthlyPlan_responses_401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
                 
         403:
           description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getToursMonthlyPlan_responses_403'
+                $ref: '#/components/schemas/NotHaveRules_responses_403'
                 
   /tours/stats:
     get:
@@ -749,14 +794,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getTourStats_responses_401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
                 
         403:
           description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getTourStats_responses_403'
+                $ref: '#/components/schemas/NotHaveRules_responses_403'
 
   /reviews:
     get:
@@ -777,7 +822,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getAllReviews_responses_401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
+                
+        403:
+          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotHaveRules_responses_403'
                 
   /tours/{id}/reviews:
     get:
@@ -804,14 +856,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/createOneReviewOnTour_responses_401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
                         
         500: 
           description: Ошибка возникает если введён не правильный формат ID тура
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/createOneReviewOnTour_responses_500'
+                $ref: '#/components/schemas/InvalidObjectId_responses_500'
     
     post:
       security:
@@ -843,7 +895,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/createOneTour_responses_401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
         
         500:
           description: Ошибка появляется если тур с данным именем уже существует
@@ -854,7 +906,7 @@ paths:
   
   /reviews/{id}:
     patch:
-      summary: Восстановления пароля по токену восстановления пароля
+      summary: Редактирование одного комментария по его ID
       tags:
         - reviews
       parameters:
@@ -863,7 +915,7 @@ paths:
             schema:
               type: string
             required: true
-            description: Токен восстановления пароля
+            description: ID комментария
       requestBody:
         content:
           application/json:
@@ -871,7 +923,7 @@ paths:
               $ref: '#/components/schemas/editReviewForm'
       responses:
         200:
-          description: Письмо с токеном восстановления пароля успешно отправлен на почту
+          description: Комментарий успешно обновлён
           content:
             application/json:
               schema:
@@ -882,28 +934,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/editReview_responses_401'
-          
-        403:
-          description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/editReview_responses_403'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
         
         404:
           description: Нет комментария с данным ID
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/editReview_responses__404'
+                $ref: '#/components/schemas/NotFoundDocument_responses__404'
         
         500: 
           description: Ошибка возникает если введён не правильный формат ID тура
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/editReview_responses_500'
+                $ref: '#/components/schemas/InvalidObjectId_responses_500'
   
     delete:
       security:
@@ -930,12 +975,20 @@ paths:
                   data:
                     type: string
                     example: null
+                    
+        401:
+          description: Ошибка возникает если пользователь не залогинился, но пытается совершить действие
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
+        
         404:
           description: Нет пользователя с данным ID
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/deleteOneReviewOnTour_responses__400'
+                $ref: '#/components/schemas/NotFoundDocument_responses__404'
                 
   /bookings:
     get:
@@ -957,14 +1010,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getAllBookings_responses_401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
                 
         403:
           description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getAllBookings_responses_403'
+                $ref: '#/components/schemas/NotHaveRules_responses_403'
                 
   /bookings/{id}:
     get:
@@ -992,21 +1045,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getOneBooking_responses_401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
                 
         403:
           description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getOneBooking_responses_403'
+                $ref: '#/components/schemas/NotHaveRules_responses_403'
         
         404:
           description: Нет бронирования с данным ID
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getOneBooking_responses__404'
+                $ref: '#/components/schemas/NotFoundDocument_responses__404'
                 
     delete:
       security:
@@ -1033,21 +1086,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/deleteOneBooking_responses_401'
+                $ref: '#/components/schemas/UserNotLogin_responses_401'
                 
         403:
           description: Ошибка возникает, когда действие пытается выполнить пользователь с ролью у которой отстутствуют права на совершения подобных действий.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/deleteOneBooking_responses_403'
+                $ref: '#/components/schemas/NotHaveRules_responses_403'
         
         404:
           description: Нет бронирования с данным ID
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/deleteOneBooking_responses__404'
+                $ref: '#/components/schemas/NotFoundDocument_responses__404'
                     
 components:
   securitySchemes:
@@ -1100,28 +1153,6 @@ components:
         _id:
           type: string
           example: 61ed442d538f9ba2b006def6
-          
-    signup_responses__400:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 400
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Пожалуйста заполните все поля
         
     signup_responses__409:
       type: object
@@ -1178,28 +1209,6 @@ components:
           type: string
           example: "2022-01-08T12:32:51.572Z"
           
-    login_responses__400:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 400
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Пожалуйста заполните все поля
-          
     login_responses__401:
       type: object
       properties:
@@ -1228,28 +1237,6 @@ components:
         email:
           type: string
           example: vladislav.pestsov@gmail.com
-    
-    forgotPassword_responses__404:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 404
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Не существует пользователя с данным Email адресом
           
     resetPasswordForm:
       type: object
@@ -1260,28 +1247,6 @@ components:
         passwordConfirm:
           type: string
           example: password123
-    
-    resetPassword_responses__400:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 400
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Неверный токен или его срок годности истёк
           
     updateMyPasswordForm:
       type: object
@@ -1385,27 +1350,6 @@ components:
           type: string
           example: Токен, который Вам принадлежит, больше не существует.
       
-    deleteMe_responses__403:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 403
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не обладаете достаточными права для сорвершения подобных действий.      
           
     users_responses_200:
       type: array
@@ -1585,110 +1529,6 @@ components:
                 passwordResetToken:
                   type: string
                   example: d917a4d6c1ad1aa71ef407bb026b7d14e10219d505840048187121d078ce0041
-                
-    updateOneUser_responses__401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
-    
-    updateOneUser_responses_403:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 403
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не владеете достаточными правами для совершения подобных действий
-    
-              
-    updateOneUser_responses__404:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 404
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Нет документa з данным ID
-    
-    updateOneUser_responses_500:
-      type: object
-      properties:
-        status: 
-          type: string
-          example: error
-        error:
-          type: object
-          properties:
-            stringValue: 
-              type: string
-              example: 5c88fa8cf4afda39709c294522
-            valueType:
-              type: string
-              example: string
-            kind: 
-              type: string
-              example: objectId
-            value: 
-              type: string
-              example: 5c88fa8cf4afda39709c294522
-            path: 
-              type: string
-              example: tour
-            reason: 
-              type: string
-              example: {}
-            name: 
-              type: string
-              example: CastError
-            message: 
-              type: string
-              example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "_id" for model "User"
-        message:
-          type: string
-          example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "_id" for model "User"
     
     me_responses_200:
       type: object
@@ -1727,28 +1567,6 @@ components:
                     type: string
                     example: 8759a136a875295aeafe65fc56a404d68d327761d1d70e38e7982bfc90ce0ca0
                   
-    me_responses_401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
-    
     updateOneTourMultipartFormData:
       type: object
       properties:
@@ -2051,131 +1869,8 @@ components:
                   type: string
                   example: 5c88fa8cf4afda39709c2955
                 
-    updateOneTour_responses__401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
+
     
-    updateOneTour_responses_403:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 403
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не владеете достаточными правами для совершения подобных действий
-    
-              
-    updateOneTour_responses__404:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 404
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Нет документa з данным ID
-    
-    updateOneTour_responses_500:
-      type: object
-      properties:
-        status: 
-          type: string
-          example: error
-        error:
-          type: object
-          properties:
-            stringValue: 
-              type: string
-              example: 5c88fa8cf4afda39709c294522
-            valueType:
-              type: string
-              example: string
-            kind: 
-              type: string
-              example: objectId
-            value: 
-              type: string
-              example: 5c88fa8cf4afda39709c294522
-            path: 
-              type: string
-              example: tour
-            reason: 
-              type: string
-              example: {}
-            name: 
-              type: string
-              example: CastError
-            message: 
-              type: string
-              example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "_id" for model "Tour"
-        message:
-          type: string
-          example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "_id" for model "Tour"
-    
-    deleteUser_responses__404:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 404
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Нет документa з данным ID
           
     getAllTours_responses_200:
         type: object
@@ -2347,29 +2042,6 @@ components:
                         type: string
                         example: 5c88fa8cf4afda39709c2955
                       
-                      
-    getAllTours_responses_401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
-          
     getOneTour_responses_200:
         type: object
         properties:
@@ -2535,29 +2207,6 @@ components:
                     type: string
                     example: 5c88fa8cf4afda39709c2955
                       
-                      
-    getOneTour_responses_401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную 
-          
     getDistances_responses__200:
         type: object
         properties:
@@ -2888,29 +2537,6 @@ components:
             data:
               $ref: '#/components/schemas/createOneTourForm'
         
-
-    createOneTour_responses_401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
-    
     createOneTour_responses_500:
       type: object
       properties:
@@ -2948,28 +2574,6 @@ components:
           type: string
           example: E11000 duplicate key error collection notours.tours index name_1 dup key { name \"Северное сияние\" }
           
-    deleteOneTour_responses__400:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 404
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Нет документa з данным ID
-          
     getToursMonthlyPlan_responses_200:
         type: object
         properties:
@@ -2995,50 +2599,6 @@ components:
                       type: number
                       example: 1
                         
-    getToursMonthlyPlan_responses_401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
-          
-    getToursMonthlyPlan_responses_403:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 403
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не владеете достаточными правами для совершения подобных действий
-    
     getTourStats_responses_200:
         type: object
         properties:
@@ -3074,52 +2634,6 @@ components:
                       type: number
                       example: 1197
                         
-    getTourStats_responses_401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
-          
-    getTourStats_responses_403:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 403
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не владеете достаточными правами для совершения подобных действий
-    
-    
-          
     getAllReviews_responses_200:
         type: object
         properties:
@@ -3168,28 +2682,6 @@ components:
                       type: string
                       example: 61d2e93ce107e4436db7e519
 
-    getAllReviews_responses_401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
-    
     createOneReviewOnTour_responses_200:
         type: object
         properties:
@@ -3238,65 +2730,6 @@ components:
                       type: string
                       example: 61d2e93ce107e4436db7e519
 
-    createOneReviewOnTour_responses_401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
-    
-    createOneReviewOnTour_responses_500:
-      type: object
-      properties:
-        status: 
-          type: string
-          example: error
-        error:
-          type: object
-          properties:
-            stringValue: 
-              type: string
-              example: 5c88fa8cf4afda39709c294522
-            valueType:
-              type: string
-              example: string
-            kind: 
-              type: string
-              example: objectId
-            value: 
-              type: string
-              example: 5c88fa8cf4afda39709c294522
-            path: 
-              type: string
-              example: tour
-            reason: 
-              type: string
-              example: {}
-            name: 
-              type: string
-              example: CastError
-            message: 
-              type: string
-              example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "tour" for model "Review"
-        message:
-          type: string
-          example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "tour" for model "Review"
-    
     createOneReviewForm:
         type: object
         properties:
@@ -3307,28 +2740,6 @@ components:
             type: string
             example: Лучшее путешествие, которое было в моей жизни
   
-    deleteOneReviewOnTour_responses__400:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 404
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Нет документa з данным ID
-          
     editReviewForm:
       type: object
       properties:
@@ -3383,106 +2794,6 @@ components:
                   type: string
                   example: 61d2e978e107e4436db7e55c
                   
-    editReview_responses_401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
-    
-    editReview_responses_403:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 403
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не владеете достаточными правами для совершения подобных действий
-    
-              
-    editReview_responses__404:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 404
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Нет документa з данным ID
-          
-    editReview_responses_500:
-      type: object
-      properties:
-        status: 
-          type: string
-          example: error
-        error:
-          type: object
-          properties:
-            stringValue: 
-              type: string
-              example: 5c88fa8cf4afda39709c294522
-            valueType:
-              type: string
-              example: string
-            kind: 
-              type: string
-              example: objectId
-            value: 
-              type: string
-              example: 5c88fa8cf4afda39709c294522
-            path: 
-              type: string
-              example: tour
-            reason: 
-              type: string
-              example: {}
-            name: 
-              type: string
-              example: CastError
-            message: 
-              type: string
-              example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "tour" for model "Review"
         message:
           type: string
           example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "tour" for model "Review"
@@ -3567,50 +2878,7 @@ components:
                       type: boolean
                       example: true
                         
-    getAllBookings_responses_401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
-          
-    getAllBookings_responses_403:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 403
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не владеете достаточными правами для совершения подобных действий
-          
+
     getOneBooking_responses_200:
         type: object
         properties:
@@ -3682,72 +2950,6 @@ components:
               paid: 
                 type: boolean
                 example: true
-                        
-    getOneBooking_responses_401:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 401
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
-          
-    getOneBooking_responses_403:
-      type: object
-      properties:
-        status:
-          type: string
-          example: fail
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 403
-            status: 
-              type: string
-              example: fail
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Вы не владеете достаточными правами для совершения подобных действий
-          
-    getOneBooking_responses__404:
-      type: object
-      properties:
-        status:
-          type: string
-          example: error
-        error:
-          type: object
-          properties:
-            statusCode:
-              type: integer
-              example: 404
-            status: 
-              type: string
-              example: error
-            isOperational: 
-              type: boolean
-              example: true
-        message:
-          type: string
-          example: Нет документa з данным ID
           
     deleteOneBooking_responses_204:
         type: object
@@ -3758,8 +2960,52 @@ components:
           data:
             type: number
             example: null
+  
+    HaveNotUserWithThisEmail_responses__404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 404
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Не существует пользователя с данным Email адресом
+  
+    EmptyFields_responses__400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        error:
+          type: object
+          properties:
+            statusCode:
+              type: integer
+              example: 400
+            status: 
+              type: string
+              example: fail
+            isOperational: 
+              type: boolean
+              example: true
+        message:
+          type: string
+          example: Пожалуйста заполните все поля
                         
-    deleteOneBooking_responses_401:
+    UserNotLogin_responses_401:
       type: object
       properties:
         status:
@@ -3781,7 +3027,7 @@ components:
           type: string
           example: Вы не залогинились! Пожалуйста ввойдите в вашу учётную запись
           
-    deleteOneBooking_responses_403:
+    NotHaveRules_responses_403:
       type: object
       properties:
         status:
@@ -3803,7 +3049,7 @@ components:
           type: string
           example: Вы не владеете достаточными правами для совершения подобных действий
           
-    deleteOneBooking_responses__404:
+    NotFoundDocument_responses__404:
       type: object
       properties:
         status:
@@ -3824,3 +3070,40 @@ components:
         message:
           type: string
           example: Нет документa з данным ID
+          
+    InvalidObjectId_responses_500:
+      type: object
+      properties:
+        status: 
+          type: string
+          example: error
+        error:
+          type: object
+          properties:
+            stringValue: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            valueType:
+              type: string
+              example: string
+            kind: 
+              type: string
+              example: objectId
+            value: 
+              type: string
+              example: 5c88fa8cf4afda39709c294522
+            path: 
+              type: string
+              example: tour
+            reason: 
+              type: string
+              example: {}
+            name: 
+              type: string
+              example: CastError
+            message: 
+              type: string
+              example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "_id" for model "Tour"
+        message:
+          type: string
+          example: Cast to ObjectId failed for value "5c88fa8cf4afda39709c294522" (type string) at path "_id" for model "Tour"
